@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jp2k-info"
+version = "1.0.0"
+description = "JPEG 2000 Deep Inspector & Encoding Analyzer (ISO/IEC 15444-1)"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "JPEG 2000 Inspection Suite" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+
+[project.scripts]
+jp2k-info = "jp2k_info.cli:main"
