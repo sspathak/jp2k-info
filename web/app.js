@@ -1,5 +1,6 @@
 /**
  * Main Application Controller for JPEG 2000 Inspector Web App.
+ * Handles UI interactions, URL loading, drag-and-drop, and visual updates.
  */
 
 import { ClientJP2Parser } from './parser.js';
@@ -22,8 +23,15 @@ class App {
   }
 
   initElements() {
+    // Source controls
+    this.sourceTabs = document.querySelectorAll('.source-tab');
+    this.sourcePanels = document.querySelectorAll('.source-panel');
     this.sampleSelect = document.getElementById('sample-select');
     this.fileInput = document.getElementById('file-input');
+    this.urlInput = document.getElementById('url-input');
+    this.btnFetchUrl = document.getElementById('btn-fetch-url');
+    this.chipUrls = document.querySelectorAll('.chip-url');
+
     this.dropOverlay = document.getElementById('drop-overlay');
     this.themeToggle = document.getElementById('theme-toggle');
 
@@ -56,7 +64,7 @@ class App {
     this.metricTiles = document.getElementById('metric-tiles');
     this.metricTileDim = document.getElementById('metric-tile-dim');
     this.metricRatio = document.getElementById('metric-ratio');
-    this.metricBpp = document.getElementById('metric-bpp');
+    this.metricCbDim = document.getElementById('metric-cb-dim');
 
     // Preview
     this.previewImg = document.getElementById('preview-image');
@@ -101,7 +109,18 @@ class App {
   }
 
   bindEvents() {
-    // Tabs
+    // Source tabs
+    this.sourceTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const source = tab.getAttribute('data-source');
+        this.sourceTabs.forEach(t => t.classList.remove('active'));
+        this.sourcePanels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`panel-source-${source}`)?.classList.add('active');
+      });
+    });
+
+    // Content navigation tabs
     this.tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const targetTab = btn.getAttribute('data-tab');
@@ -118,6 +137,28 @@ class App {
     this.sampleSelect.addEventListener('change', (e) => {
       const val = e.target.value;
       if (val) this.loadSample(val);
+    });
+
+    // URL fetch
+    this.btnFetchUrl.addEventListener('click', () => {
+      const url = this.urlInput.value.trim();
+      if (url) this.loadUrl(url);
+    });
+
+    this.urlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const url = this.urlInput.value.trim();
+        if (url) this.loadUrl(url);
+      }
+    });
+
+    // Quick URL chips
+    this.chipUrls.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const url = chip.getAttribute('data-url');
+        this.urlInput.value = url;
+        this.loadUrl(url);
+      });
     });
 
     // File input
@@ -210,7 +251,7 @@ class App {
           return;
         }
       } catch (_) {
-        // Fall back to client-side parsing
+        // Fall back to static loading
       }
     }
 
@@ -240,6 +281,67 @@ class App {
       this.applyData(meta);
     } catch (err) {
       this.showToast(`Error loading sample: ${err.message}`, true);
+    }
+  }
+
+  async loadUrl(url) {
+    const spinner = this.btnFetchUrl.querySelector('.btn-spinner');
+    const btnText = this.btnFetchUrl.querySelector('.btn-text');
+    spinner.classList.remove('hidden');
+    btnText.textContent = 'Fetching...';
+    this.btnFetchUrl.disabled = true;
+
+    try {
+      let meta = null;
+      let rawBuffer = null;
+      const isStaticHost = window.location.hostname.includes('github.io') ||
+                           window.location.protocol === 'file:';
+
+      // 1. If backend server is available, try server proxy first (avoids CORS restrictions)
+      if (!isStaticHost) {
+        try {
+          const apiResp = await fetch(`/api/fetch_url?url=${encodeURIComponent(url)}`);
+          if (apiResp.ok) {
+            meta = await apiResp.json();
+            // Also fetch raw buffer for hex viewer
+            const binResp = await fetch(url);
+            if (binResp.ok) {
+              rawBuffer = await binResp.arrayBuffer();
+            }
+          }
+        } catch (_) {}
+      }
+
+      // 2. Direct client-side fetch if not loaded via proxy
+      if (!rawBuffer) {
+        const resp = await fetch(url);
+        if (!resp.ok) {
+          throw new Error(`Server returned HTTP ${resp.status}: ${resp.statusText}`);
+        }
+        rawBuffer = await resp.arrayBuffer();
+      }
+
+      this.currentRawBytes = new Uint8Array(rawBuffer);
+
+      if (!meta || meta.error) {
+        const cleanName = url.split('/').pop().split('?')[0] || 'remote_image.jp2';
+        const parser = new ClientJP2Parser(rawBuffer, cleanName);
+        meta = parser.parse();
+        meta.preview_url = null;
+      }
+
+      this.applyData(meta);
+      this.showToast(`Successfully loaded from URL: ${meta.filename}`);
+    } catch (err) {
+      let msg = err.message;
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        msg = 'CORS restriction blocked direct fetch. Run locally via "./jp2k-info serve" to proxy remote URLs or test a CORS-enabled URL.';
+      }
+      this.showToast(`Failed to load URL: ${msg}`, true);
+    } finally {
+      spinner.classList.add('hidden');
+      btnText.textContent = 'Fetch & Inspect';
+      this.btnFetchUrl.disabled = false;
     }
   }
 
@@ -291,7 +393,7 @@ class App {
     this.fileNameEl.textContent = meta.filename;
     this.badgeFormatEl.textContent = meta.format;
     this.badgeModeEl.textContent = s.compression_mode;
-    this.badgeModeEl.className = `badge ${s.is_lossless ? 'badge-lossless' : 'badge-lossy'}`;
+    this.badgeModeEl.className = `badge has-tooltip ${s.is_lossless ? 'badge-lossless' : 'badge-lossy'}`;
     this.badgeSizeEl.textContent = this.formatBytes(meta.file_size);
 
     const socMarker = meta.codestream_markers?.find(m => m.code === 'SOC');
@@ -299,30 +401,30 @@ class App {
       `Codestream SOC at offset 0x${socMarker.offset.toString(16).toUpperCase().padStart(4, '0')}` :
       'Container encapsulated codestream';
 
-    // 8 Metrics Grid
+    // 4 Spec Matrix Groups
     this.metricDim.textContent = s.dimensions;
-    this.metricMp.textContent = `${s.megapixels} MP`;
+    this.metricMp.textContent = `${s.megapixels} Megapixels`;
+
+    this.metricDepth.textContent = `${s.bit_depth}-bit ${s.is_signed ? 'Signed' : 'Unsigned'}`;
+    this.metricColor.textContent = `${s.colorspace} (${s.num_components} components)`;
 
     this.metricWavelet.textContent = s.is_reversible ? '5/3 Reversible' : '9/7 Irreversible';
     this.metricWaveletSub.textContent = s.wavelet_filter?.split('(')[0]?.trim() || '';
 
+    this.metricMct.textContent = s.multiple_component_transform?.split('(')[0]?.trim() || 'No MCT';
+    this.metricRatio.textContent = `Ratio: ${s.compression_ratio} (${s.bits_per_pixel} bpp)`;
+
     this.metricProg.textContent = s.progression_order;
     this.metricProgSub.textContent = s.progression_description?.split('(')[0]?.trim() || '';
 
-    this.metricLayers.textContent = `${s.num_layers} ${s.num_layers === 1 ? 'Layer' : 'Layers'}`;
-    this.metricMct.textContent = s.multiple_component_transform;
-
-    this.metricDecomp.textContent = `${s.decomposition_levels} Levels`;
-    this.metricScales.textContent = `${s.resolution_levels_count} Resolution Scales`;
-
-    this.metricColor.textContent = s.colorspace;
-    this.metricDepth.textContent = `${s.bit_depth}-bit ${s.is_signed ? 'Signed' : 'Unsigned'}`;
+    this.metricDecomp.textContent = `${s.decomposition_levels} DWT Levels`;
+    this.metricLayers.textContent = `${s.num_layers} ${s.num_layers === 1 ? 'Quality Layer' : 'Quality Layers'}`;
 
     this.metricTiles.textContent = `${s.tile_grid.total_tiles} ${s.tile_grid.total_tiles === 1 ? 'Tile' : 'Tiles'}`;
     this.metricTileDim.textContent = `${s.tile_grid.tile_width} × ${s.tile_grid.tile_height} px`;
 
-    this.metricRatio.textContent = s.compression_ratio;
-    this.metricBpp.textContent = `${s.bits_per_pixel} bpp`;
+    this.metricCbDim.textContent = `${s.codeblock_dimensions} px`;
+    this.metricScales.textContent = `${s.resolution_levels_count} Resolution Scales`;
 
     // Render Tab 1: DWT
     this.dwtVis.setData(s.dwt_subband_tree, s.width, s.height);
@@ -335,20 +437,20 @@ class App {
     // Render Tab 3: Coding Styles & Modes
     this.renderCodingStyles(s);
 
-    // Render Tab 4: Quantization
+    // Render Tab 3: Quantization
     this.renderQuantization(s);
 
-    // Render Tab 5: Image preview
+    // Render Tab 4: Image preview
     this.renderPreview(meta);
 
-    // Render Tab 6: Box & Marker Tree
+    // Render Tab 5: Box & Marker Tree
     this.renderTree(meta);
 
-    // Render Tab 7: Hex dump
+    // Render Tab 5: Hex dump
     this.hexOffset = 0;
     this.renderHex();
 
-    // Render Tab 8: Comments & XML
+    // Render Tab 6: Comments & XML
     this.renderMetadata(s);
   }
 
@@ -363,7 +465,7 @@ class App {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>Level ${r.resolution_level}</td>
-        <td>${r.width} × ${r.height}</td>
+        <td>${r.width} × ${r.height} px</td>
         <td>${r.scale_factor}</td>
         <td>${r.precinct_width || 32768} × ${r.precinct_height || 32768}</td>
       `;
@@ -393,10 +495,12 @@ class App {
 
   renderCodingStyles(s) {
     document.getElementById('cb-dims-text').textContent = `${s.codeblock_dimensions} px`;
-    document.getElementById('cb-sop-text').textContent = s.has_sop ? '✅ Enabled (Start of Packet)' : '❌ Disabled';
-    document.getElementById('cb-eph-text').textContent = s.has_eph ? '✅ Enabled (End of Packet Header)' : '❌ Disabled';
-    document.getElementById('cb-mct-text').textContent = s.multiple_component_transform;
-    document.getElementById('cb-prog-text').textContent = `${s.progression_order} — ${s.progression_description}`;
+    document.getElementById('cb-sop-text').textContent = s.has_sop ? '✅ Enabled (Start of Packet markers)' : '❌ Disabled';
+    document.getElementById('cb-eph-text').textContent = s.has_eph ? '✅ Enabled (End of Packet Header markers)' : '❌ Disabled';
+
+    const precText = s.precinct_sizes && s.precinct_sizes.length > 0 && !s.precinct_sizes[0].default ?
+      'Custom user precincts defined' : 'Default (32768 × 32768 px)';
+    document.getElementById('cb-precincts-text').textContent = precText;
 
     const modesGrid = document.getElementById('modes-list');
     modesGrid.innerHTML = '';
@@ -422,7 +526,7 @@ class App {
     tbody.innerHTML = '';
     const subbands = s.dwt_subband_tree || [];
     if (!subbands.length) {
-      tbody.innerHTML = '<tr><td colspan="7" class="placeholder-text">No quantization subband data</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="placeholder-text">No quantization subband data</td></tr>';
       return;
     }
 
@@ -436,7 +540,6 @@ class App {
         <td>${sb.exponent}</td>
         <td>${sb.mantissa}</td>
         <td>${stepStr}</td>
-        <td>${sb.exponent || 8} bits</td>
       `;
       tbody.appendChild(tr);
     });
@@ -530,7 +633,7 @@ class App {
   }
 
   applyChannelFilter(channel) {
-    if (!this.previewImg.src) return;
+    if (!this.previewImg.src || this.previewImg.classList.contains('hidden')) return;
     const img = this.previewImg;
     const canvas = this.channelCanvas;
     const ctx = canvas.getContext('2d');
@@ -616,13 +719,11 @@ class App {
   renderTree(meta) {
     this.treeContainer.innerHTML = '';
 
-    // If JP2 container format, render boxes
     if (meta.boxes && meta.boxes.length) {
       for (const box of meta.boxes) {
         this.renderBoxNode(box, this.treeContainer);
       }
     } else {
-      // Direct codestream markers
       for (const m of meta.codestream_markers || []) {
         this.renderMarkerNode(m, this.treeContainer);
       }
@@ -654,7 +755,6 @@ class App {
       }
       parentEl.appendChild(childContainer);
     } else if (box.type === 'jp2c') {
-      // Under jp2c, show the codestream markers!
       const childContainer = document.createElement('div');
       childContainer.className = 'tree-children';
       for (const m of this.currentData.codestream_markers || []) {
@@ -684,7 +784,7 @@ class App {
 
   selectTreeItem(item, kind) {
     this.selectedItemTitle.textContent = `${item.name || item.code} (${item.type || item.marker})`;
-    this.selectedItemOffset.textContent = `Offset 0x${item.offset.toString(16).toUpperCase().padStart(6, '0')} | Length ${item.length} B`;
+    this.selectedItemOffset.textContent = `Offset 0x${item.offset.toString(16).toUpperCase().padStart(6, '0')} • Length ${item.length} B`;
 
     // Highlight in Hex Viewer
     this.hexHighlightRange = [item.offset, item.offset + item.length];

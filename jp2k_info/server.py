@@ -154,6 +154,32 @@ class JP2Handler(BaseHTTPRequestHandler):
             meta['catalog_info'] = sample_entry
             meta['preview_url'] = f"/api/preview/{sample_entry['filename']}"
             self.send_json(meta)
+        elif path == "/api/fetch_url":
+            target_url = query.get('url', [''])[0]
+            if not target_url:
+                self.send_json({'error': 'Missing url parameter'}, status=400)
+                return
+            try:
+                import urllib.request
+                req = urllib.request.Request(
+                    target_url,
+                    headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) jp2k-info/1.0'}
+                )
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    raw_bytes = resp.read()
+                filename = os.path.basename(target_url.split('?')[0]) or 'remote.jp2'
+                p = JPEG2000Parser(raw_bytes, filename)
+                res = p.parse()
+                safe_name = os.path.basename(filename)
+                save_path = os.path.join(UPLOAD_DIR, safe_name)
+                with open(save_path, "wb") as f:
+                    f.write(raw_bytes)
+                decomp = ensure_preview_png(save_path)
+                if decomp and os.path.exists(decomp):
+                    res['preview_url'] = f"/api/preview/{os.path.basename(safe_name)}"
+                self.send_json(res)
+            except Exception as e:
+                self.send_json({'error': f'Failed to fetch or parse URL: {e}'}, status=400)
         elif path.startswith("/api/preview/"):
             filename = path[len("/api/preview/"):]
             # Look in samples or uploads

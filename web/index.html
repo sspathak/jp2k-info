@@ -10,165 +10,263 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
-  <!-- Drag & Drop Overlay -->
+  <!-- Drag & Drop Full Window Overlay -->
   <div id="drop-overlay" class="drop-overlay hidden">
     <div class="drop-modal">
       <div class="drop-icon">📂</div>
-      <h3>Drop JPEG 2000 File Here</h3>
-      <p>Accepts .jp2, .j2k, .jpc, .jpx files</p>
+      <h3>Drop JPEG 2000 File</h3>
+      <p>Supports .jp2, .j2k, .jpc, .jpx formats</p>
     </div>
   </div>
 
-  <!-- Header -->
+  <!-- Top App Navigation -->
   <header class="app-header">
-    <div class="header-left">
-      <div class="logo-mark">
-        <span class="logo-letters">J2K</span>
-      </div>
-      <div class="logo-text">
+    <div class="header-brand">
+      <div class="logo-mark">J2K</div>
+      <div class="brand-text">
         <h1>JPEG 2000 Inspector</h1>
         <span class="badge-iso">ISO/IEC 15444-1</span>
       </div>
     </div>
 
-    <div class="header-center">
-      <div class="sample-picker-group">
-        <label for="sample-select">Samples:</label>
-        <select id="sample-select" class="sample-select">
-          <option value="">-- Choose a built-in sample --</option>
-          <option value="lossless_5_3">Lossless 5/3 Reversible (RGB)</option>
-          <option value="lossy_9_7_multitile">Lossy 9/7 Irreversible (2×2 Tiled)</option>
-          <option value="multilayer_progressive">Multilayer Progressive (4 Layers, RPCL)</option>
-          <option value="error_resilient">Error-Resilient Bitstream (All 6 Modes + SOP/EPH)</option>
-          <option value="grayscale_12bit">12-bit High Dynamic Range (Grayscale)</option>
-          <option value="subsampled_420">Chroma Subsampled 4:2:0</option>
-          <option value="raw_codestream">Raw J2K Codestream (No Box Wrapper)</option>
-          <option value="xml_and_metadata">XML Metadata & Copyright Box</option>
-          <option value="metadata_comment">Encoder Comments (COM Marker)</option>
-        </select>
-      </div>
-      <label class="btn btn-primary file-btn">
-        <span>Open File</span>
-        <input type="file" id="file-input" accept=".jp2,.j2k,.jpc,.jpx,.jpm,image/jp2" hidden>
-      </label>
-    </div>
-
-    <div class="header-right">
-      <button id="btn-export-json" class="btn btn-secondary" title="Export full metadata as JSON">
+    <div class="header-actions">
+      <button id="btn-export-json" class="btn btn-secondary btn-sm" title="Export full metadata as JSON">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span>JSON</span>
       </button>
-      <button id="btn-export-md" class="btn btn-secondary" title="Export Markdown summary report">
+      <button id="btn-export-md" class="btn btn-secondary btn-sm" title="Export Markdown summary report">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         <span>Report</span>
       </button>
-      <button id="btn-copy-summary" class="btn btn-secondary" title="Copy summary to clipboard">
+      <button id="btn-copy-summary" class="btn btn-secondary btn-sm" title="Copy summary to clipboard">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         <span>Copy</span>
       </button>
-      <button id="theme-toggle" class="btn btn-icon" title="Toggle theme">
+      <div class="divider-v"></div>
+      <button id="theme-toggle" class="btn btn-icon" title="Toggle Light/Dark Theme">
         <span class="theme-icon">☀️</span>
       </button>
     </div>
   </header>
 
+  <!-- Source Input Bar -->
+  <section class="source-toolbar">
+    <div class="source-nav">
+      <button class="source-tab active" data-source="samples">
+        <span>📁 Built-in Samples</span>
+      </button>
+      <button class="source-tab" data-source="url">
+        <span>🌐 Load from URL</span>
+      </button>
+      <button class="source-tab" data-source="upload">
+        <span>⬆️ Upload File</span>
+      </button>
+    </div>
+
+    <!-- Source Panel: Samples -->
+    <div id="panel-source-samples" class="source-panel active">
+      <div class="source-row">
+        <label for="sample-select" class="source-label">Select Profile:</label>
+        <select id="sample-select" class="sample-select">
+          <option value="lossless_5_3">Lossless 5/3 Reversible (RGB • Le Gall 5/3 • RCT)</option>
+          <option value="lossy_9_7_multitile">Lossy 9/7 Irreversible (2×2 Spatial Tiles • RLCP)</option>
+          <option value="multilayer_progressive">Multilayer Progressive (4 Quality Layers • RPCL)</option>
+          <option value="error_resilient">Error-Resilient Bitstream (All 6 Modes • SOP/EPH)</option>
+          <option value="grayscale_12bit">12-bit High Dynamic Range (Medical / Satellite)</option>
+          <option value="subsampled_420">Chroma Subsampled 4:2:0 (XR=2, YR=2)</option>
+          <option value="raw_codestream">Raw J2K Codestream (Headerless • SOC Start)</option>
+          <option value="xml_and_metadata">XML Metadata & Copyright Box (Dublin Core)</option>
+          <option value="metadata_comment">Encoder Signature Comments (COM Marker)</option>
+        </select>
+        <span class="source-hint">Instant pre-loaded JPEG 2000 test files</span>
+      </div>
+    </div>
+
+    <!-- Source Panel: URL -->
+    <div id="panel-source-url" class="source-panel">
+      <div class="source-row url-input-row">
+        <div class="url-input-wrap">
+          <svg class="url-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <input type="url" id="url-input" class="url-input" placeholder="Enter URL to any .jp2 or .j2k file (e.g. https://.../image.jp2)">
+        </div>
+        <button id="btn-fetch-url" class="btn btn-primary">
+          <span class="btn-text">Fetch & Inspect</span>
+          <span class="btn-spinner hidden"></span>
+        </button>
+      </div>
+      <div class="quick-urls">
+        <span class="quick-url-label">Quick test links:</span>
+        <button class="chip-url" data-url="./samples/lossy_9_7_multitile.jp2">Multi-Tile 9/7</button>
+        <button class="chip-url" data-url="./samples/error_resilient.jp2">Error-Resilient</button>
+        <button class="chip-url" data-url="./samples/grayscale_12bit.jp2">12-bit HDR</button>
+        <button class="chip-url" data-url="./samples/multilayer_progressive.jp2">4-Layer Progressive</button>
+      </div>
+    </div>
+
+    <!-- Source Panel: Upload -->
+    <div id="panel-source-upload" class="source-panel">
+      <div class="source-row upload-row">
+        <label class="btn btn-primary file-btn">
+          <span>Choose JPEG 2000 File</span>
+          <input type="file" id="file-input" accept=".jp2,.j2k,.jpc,.jpx,.jpm,image/jp2" hidden>
+        </label>
+        <span class="source-hint">Or simply drag & drop any file anywhere onto this window</span>
+      </div>
+    </div>
+  </section>
+
   <!-- Main Container -->
   <main class="main-content">
-    <!-- File Banner & Overview Stats -->
-    <section class="hero-overview card">
-      <div class="hero-top">
-        <div class="file-title-area">
+    <!-- Structured Summary Card -->
+    <section class="summary-hero card">
+      <div class="summary-header">
+        <div class="file-ident">
           <h2 id="file-name" class="file-name">lossless_5_3.jp2</h2>
-          <div class="file-badges">
-            <span id="badge-format" class="badge badge-container">JP2 Container</span>
-            <span id="badge-mode" class="badge badge-lossless">Mathematically Lossless</span>
+          <div class="badges-row">
+            <span id="badge-format" class="badge badge-container has-tooltip" data-tooltip="File wrapper type: JP2 Box Container conforms to ISO/IEC 15444-1 Annex I with box structure.">JP2 Container</span>
+            <span id="badge-mode" class="badge badge-lossless has-tooltip" data-tooltip="Compression reversibility: Mathematically Lossless indicates bit-exact reconstruction using Le Gall 5/3 filter and RCT.">Mathematically Lossless</span>
             <span id="badge-size" class="badge badge-neutral">4.7 KB</span>
           </div>
         </div>
-        <div class="hero-actions">
-          <span id="file-path-sub" class="file-path-sub">Codestream offset: 0x0055</span>
-        </div>
+        <div id="file-path-sub" class="file-offset-tag">Codestream offset: 0x0055</div>
       </div>
 
-      <!-- 8 Key Metrics Grid -->
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <span class="metric-label">Dimensions</span>
-          <span id="metric-dim" class="metric-value">256 × 256</span>
-          <span id="metric-mp" class="metric-sub">0.07 MP</span>
+      <!-- 4 Organized Feature Blocks -->
+      <div class="spec-matrix">
+        <!-- Group 1: Geometry & Components -->
+        <div class="spec-group">
+          <div class="group-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Geometry & Channels</span>
+          </div>
+          <div class="spec-items">
+            <div class="spec-item">
+              <span class="label">Dimensions</span>
+              <span id="metric-dim" class="value">256 × 256</span>
+              <span id="metric-mp" class="sub">0.07 Megapixels</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Components & Depth</span>
+              <span id="metric-depth" class="value">8-bit Unsigned</span>
+              <span id="metric-color" class="sub">sRGB (3 components)</span>
+            </div>
+          </div>
         </div>
-        <div class="metric-card">
-          <span class="metric-label">Wavelet Transform</span>
-          <span id="metric-wavelet" class="metric-value">5/3 Reversible</span>
-          <span id="metric-wavelet-sub" class="metric-sub">Le Gall 5/3 Integer</span>
+
+        <!-- Group 2: Wavelet & Compression -->
+        <div class="spec-group">
+          <div class="group-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h2l3 9 4-18 4 18 3-9h4"/></svg>
+            <span>Wavelet Transform</span>
+          </div>
+          <div class="spec-items">
+            <div class="spec-item">
+              <span class="label">Wavelet Filter</span>
+              <span id="metric-wavelet" class="value has-tooltip" data-tooltip="Wavelet filter specified in SPcod: Le Gall 5/3 integer filter ensures bit-exact lossless reconstruction; Daubechies 9/7 floating-point filter maximizes lossy compression.">5/3 Reversible</span>
+              <span id="metric-wavelet-sub" class="sub">Le Gall 5/3 Integer</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Color Transform (MCT)</span>
+              <span id="metric-mct" class="value has-tooltip" data-tooltip="Multiple Component Transform: RCT (Reversible Color Transform) for integer RGB-to-YUV; ICT (Irreversible Color Transform) for lossy YCbCr.">RCT Transform</span>
+              <span id="metric-ratio" class="sub">Ratio: 41.5:1 (0.58 bpp)</span>
+            </div>
+          </div>
         </div>
-        <div class="metric-card">
-          <span class="metric-label">Progression Order</span>
-          <span id="metric-prog" class="metric-value">LRCP</span>
-          <span id="metric-prog-sub" class="metric-sub">Progressive by Quality</span>
+
+        <!-- Group 3: Scalability & Progression -->
+        <div class="spec-group">
+          <div class="group-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Scalability Structure</span>
+          </div>
+          <div class="spec-items">
+            <div class="spec-item">
+              <span class="label">Progression Order</span>
+              <span id="metric-prog" class="value has-tooltip" data-tooltip="Packet ordering: LRCP (Layer, Resolution, Component, Position) allows progressive quality streaming; RLCP allows progressive resolution thumbnailing.">LRCP</span>
+              <span id="metric-prog-sub" class="sub">Progressive by Quality</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Hierarchy Levels</span>
+              <span id="metric-decomp" class="value">5 DWT Levels</span>
+              <span id="metric-layers" class="sub">1 Quality Layer</span>
+            </div>
+          </div>
         </div>
-        <div class="metric-card">
-          <span class="metric-label">Quality Layers</span>
-          <span id="metric-layers" class="metric-value">1 Layer</span>
-          <span id="metric-mct" class="metric-sub">RCT Color Transform</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-label">DWT Decomposition</span>
-          <span id="metric-decomp" class="metric-value">5 Levels</span>
-          <span id="metric-scales" class="metric-sub">6 Resolution Scales</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-label">Color & Precision</span>
-          <span id="metric-color" class="metric-value">sRGB (3 comps)</span>
-          <span id="metric-depth" class="metric-sub">8-bit Unsigned</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-label">Spatial Tiles</span>
-          <span id="metric-tiles" class="metric-value">1 Tile</span>
-          <span id="metric-tile-dim" class="metric-sub">256 × 256 px</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-label">Compression Ratio</span>
-          <span id="metric-ratio" class="metric-value">41.5:1</span>
-          <span id="metric-bpp" class="metric-sub">0.58 bits/pixel</span>
+
+        <!-- Group 4: Tiling & Code-Blocks -->
+        <div class="spec-group">
+          <div class="group-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Tiling & Code-Blocks</span>
+          </div>
+          <div class="spec-items">
+            <div class="spec-item">
+              <span class="label">Spatial Tiles</span>
+              <span id="metric-tiles" class="value">1 Tile</span>
+              <span id="metric-tile-dim" class="sub">256 × 256 px</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Code-Block Size</span>
+              <span id="metric-cb-dim" class="value has-tooltip" data-tooltip="Dimensions of code-blocks used for EBCOT entropy coding (defined as 2^(xcb+2) × 2^(ycb+2)). Max area is 4096.">64 × 64 px</span>
+              <span id="metric-scales" class="sub">6 Resolution Scales</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs">
-      <button class="tab-btn active" data-tab="tab-dwt">🌊 Wavelet Subbands (DWT)</button>
-      <button class="tab-btn" data-tab="tab-tiles">🪟 Tile Geometry</button>
-      <button class="tab-btn" data-tab="tab-modes">⚙️ Coding Styles & Modes</button>
-      <button class="tab-btn" data-tab="tab-quant">📐 Quantization Matrix</button>
-      <button class="tab-btn" data-tab="tab-preview">🖼️ Image & Channels</button>
-      <button class="tab-btn" data-tab="tab-boxes">📦 Box & Marker Tree</button>
-      <button class="tab-btn" data-tab="tab-hex">🔍 Raw Hex Inspector</button>
-      <button class="tab-btn" data-tab="tab-metadata">📝 Comments & XML</button>
+      <button class="tab-btn active" data-tab="tab-dwt">
+        <span>🌊 Wavelet & DWT</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-tiles">
+        <span>🪟 Tile Geometry</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-modes">
+        <span>⚙️ Modes & Quantization</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-preview">
+        <span>🖼️ Image & Channels</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-bitstream">
+        <span>📦 Bitstream & Hex</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-metadata">
+        <span>📝 Comments & XML</span>
+      </button>
+      <button class="tab-btn tab-guide" data-tab="tab-guide">
+        <span>📖 JPEG 2000 Guide</span>
+      </button>
     </nav>
 
-    <!-- Tab 1: Wavelet Subbands (DWT) -->
+    <!-- Tab 1: Wavelet & DWT -->
     <section id="tab-dwt" class="tab-pane active">
       <div class="split-view">
         <div class="canvas-panel card">
           <div class="panel-header">
-            <h3>2D Mallat Wavelet Decomposition Tree</h3>
-            <span class="panel-hint">Hover or click any subband to inspect parameters</span>
+            <div>
+              <h3>2D Mallat Wavelet Octave Decomposition Tree</h3>
+              <p class="panel-subtitle">Interactive frequency subband hierarchy. Hover or click any subband to inspect parameters.</p>
+            </div>
           </div>
           <div class="canvas-wrapper">
             <canvas id="dwt-canvas" width="560" height="560"></canvas>
           </div>
           <div class="dwt-legend">
-            <span class="legend-item"><span class="dot dot-ll"></span> LL (Approximation)</span>
-            <span class="legend-item"><span class="dot dot-hl"></span> HL (Horizontal High / Vert Low)</span>
-            <span class="legend-item"><span class="dot dot-lh"></span> LH (Horizontal Low / Vert High)</span>
-            <span class="legend-item"><span class="dot dot-hh"></span> HH (Diagonal High)</span>
+            <span class="legend-item"><span class="dot dot-ll"></span> LL (Approximation Low-pass)</span>
+            <span class="legend-item"><span class="dot dot-hl"></span> HL (Vertical details)</span>
+            <span class="legend-item"><span class="dot dot-lh"></span> LH (Horizontal details)</span>
+            <span class="legend-item"><span class="dot dot-hh"></span> HH (Diagonal details)</span>
           </div>
         </div>
 
         <div class="details-panel card">
           <div class="panel-header">
-            <h3>Selected Subband Details</h3>
+            <h3>Selected Subband Parameters</h3>
           </div>
           <div id="dwt-subband-info" class="subband-info-container">
-            <p class="placeholder-text">Click any subband in the tree to view its dimensions and step sizes.</p>
+            <p class="placeholder-text">Hover or click any subband in the tree to view its dimensions and step sizes.</p>
           </div>
 
           <div class="pyramid-table-area">
@@ -196,8 +294,10 @@
       <div class="split-view">
         <div class="canvas-panel card">
           <div class="panel-header">
-            <h3>Canvas Reference Grid & Spatial Tile Partitions</h3>
-            <span class="panel-hint">Click a tile to inspect its tile-part codestream segments</span>
+            <div>
+              <h3>Canvas Reference Grid & Spatial Tile Partitions</h3>
+              <p class="panel-subtitle">Visual map of reference canvas (Xsiz × Ysiz) and tile grid partitions (XTsiz × YTsiz).</p>
+            </div>
           </div>
           <div class="canvas-wrapper">
             <canvas id="tile-canvas" width="560" height="560"></canvas>
@@ -206,23 +306,23 @@
 
         <div class="details-panel card">
           <div class="panel-header">
-            <h3>Tile Information</h3>
+            <h3>Tile Part Information</h3>
           </div>
           <div id="tile-info" class="tile-info-container">
             <p class="placeholder-text">Click any tile to view its parameters.</p>
           </div>
 
           <div class="tiles-summary-table-area">
-            <h4>All Tile Parts in Codestream</h4>
+            <h4>Codestream Tile-Part Markers (SOT / SOD)</h4>
             <div class="table-responsive">
               <table id="table-tiles-list" class="data-table">
                 <thead>
                   <tr>
                     <th>Tile Index</th>
                     <th>Part Index</th>
-                    <th>Tile-part Length (Psot)</th>
+                    <th>Length (Psot)</th>
                     <th>SOT Offset</th>
-                    <th>Payload (SOD)</th>
+                    <th>Bitstream Payload</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
@@ -233,90 +333,77 @@
       </div>
     </section>
 
-    <!-- Tab 3: Coding Styles & Modes -->
+    <!-- Tab 3: Coding Modes & Quantization -->
     <section id="tab-modes" class="tab-pane">
       <div class="grid-2col">
+        <!-- Coding Styles & Error Resilience -->
         <div class="card">
           <div class="panel-header">
-            <h3>Code-Block & Packet Header Settings</h3>
+            <h3>Entropy Coding Modes & Error Resilience</h3>
+            <span class="badge badge-info has-tooltip" data-tooltip="Code-block style byte in COD/COC (SPcod parameter) controls the fractional bitplane coder.">SPcod Flags</span>
           </div>
+
           <div class="props-list">
             <div class="prop-row">
               <span class="prop-name">Code-Block Dimensions:</span>
               <span id="cb-dims-text" class="prop-val bold">64 × 64 px</span>
             </div>
             <div class="prop-row">
-              <span class="prop-name">User-Defined Precincts:</span>
-              <span id="cb-precincts-text" class="prop-val">Disabled (Standard 32768×32768)</span>
-            </div>
-            <div class="prop-row">
-              <span class="prop-name">SOP (Start of Packet) Markers:</span>
+              <span class="prop-name">Start of Packet (SOP) Markers:</span>
               <span id="cb-sop-text" class="prop-val">Disabled</span>
             </div>
             <div class="prop-row">
-              <span class="prop-name">EPH (End of Packet Header) Markers:</span>
+              <span class="prop-name">End of Packet Header (EPH):</span>
               <span id="cb-eph-text" class="prop-val">Disabled</span>
             </div>
             <div class="prop-row">
-              <span class="prop-name">Multiple Component Transform (MCT):</span>
-              <span id="cb-mct-text" class="prop-val">RCT (Reversible Color Transform)</span>
+              <span class="prop-name">Precinct Partitioning:</span>
+              <span id="cb-precincts-text" class="prop-val">Default (32768 × 32768)</span>
             </div>
-            <div class="prop-row">
-              <span class="prop-name">Progression Ordering:</span>
-              <span id="cb-prog-text" class="prop-val bold">LRCP</span>
-            </div>
+          </div>
+
+          <h4 class="subheading-modes">The 6 Code-Block Mode Switches</h4>
+          <div id="modes-list" class="modes-grid">
+            <!-- Dynamically populated -->
           </div>
         </div>
 
+        <!-- Quantization Matrix -->
         <div class="card">
           <div class="panel-header">
-            <h3>Arithmetic Coding Modes & Error Resilience</h3>
+            <h3>Quantization Matrix & Dynamic Range</h3>
+            <div class="header-badges">
+              <span id="badge-quant-style" class="badge badge-info">No Quantization</span>
+              <span id="badge-guard-bits" class="badge badge-neutral has-tooltip" data-tooltip="Number of guard bits (0-7) used in the arithmetic coder to avoid overflow during coefficient accumulation.">2 Guard Bits</span>
+            </div>
           </div>
-          <p class="section-desc">Bitplane entropy coding mode switches defined in SPcod parameter:</p>
-          <div id="modes-list" class="modes-grid">
-            <!-- Mode switch cards generated dynamically -->
+
+          <div class="formula-banner">
+            <span class="formula-tag">Quantizer Formula</span>
+            <p class="formula-math">Δ<sub>b</sub> = 2<sup>R<sub>b</sub> - ε<sub>b</sub></sup> × (1 + μ<sub>b</sub> / 2048)</p>
+            <p class="formula-desc">Where <strong>ε<sub>b</sub></strong> is the exponent, <strong>μ<sub>b</sub></strong> is the 11-bit mantissa, and <strong>R<sub>b</sub></strong> is nominal subband dynamic range.</p>
+          </div>
+
+          <div class="table-responsive">
+            <table id="table-quant-subbands" class="data-table">
+              <thead>
+                <tr>
+                  <th>Index</th>
+                  <th>Subband</th>
+                  <th>Orientation</th>
+                  <th>Exp (ε<sub>b</sub>)</th>
+                  <th>Mant (μ<sub>b</sub>)</th>
+                  <th>Step Size (Δ'<sub>b</sub>)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Tab 4: Quantization Matrix -->
-    <section id="tab-quant" class="tab-pane">
-      <div class="card">
-        <div class="panel-header">
-          <h3>Quantization Style & Subband Dynamic Range</h3>
-          <div class="header-badges">
-            <span id="badge-quant-style" class="badge badge-info">No Quantization (Reversible)</span>
-            <span id="badge-guard-bits" class="badge badge-neutral">2 Guard Bits</span>
-          </div>
-        </div>
-
-        <div class="formula-banner">
-          <p class="formula-title">ISO/IEC 15444-1 Quantization Step Size Formula:</p>
-          <p class="formula-math">Δ<sub>b</sub> = 2<sup>R<sub>b</sub> - ε<sub>b</sub></sup> × (1 + μ<sub>b</sub> / 2048)</p>
-          <p class="formula-desc">Where <strong>ε<sub>b</sub></strong> is the exponent, <strong>μ<sub>b</sub></strong> is the 11-bit mantissa, and <strong>R<sub>b</sub></strong> is the nominal subband dynamic range.</p>
-        </div>
-
-        <div class="table-responsive">
-          <table id="table-quant-subbands" class="data-table">
-            <thead>
-              <tr>
-                <th>Subband Index</th>
-                <th>Subband Name</th>
-                <th>Orientation</th>
-                <th>Exponent (ε<sub>b</sub>)</th>
-                <th>Mantissa (μ<sub>b</sub>)</th>
-                <th>Normalized Step Size (Δ'<sub>b</sub>)</th>
-                <th>Dynamic Range (bits)</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tab 5: Image & Channels Preview -->
+    <!-- Tab 4: Image & Channels -->
     <section id="tab-preview" class="tab-pane">
       <div class="split-view">
         <div class="canvas-panel card">
@@ -332,7 +419,7 @@
           </div>
           <div class="image-viewer-container">
             <img id="preview-image" class="preview-image" alt="Decoded JPEG 2000 preview">
-            <canvas id="channel-canvas" class="channel-canvas hidden" width="256" height="256"></canvas>
+            <canvas id="channel-canvas" class="channel-canvas hidden" width="380" height="380"></canvas>
             <div id="preview-placeholder" class="preview-placeholder hidden">
               <span>Preview not available directly</span>
             </div>
@@ -347,7 +434,7 @@
 
         <div class="details-panel card">
           <div class="panel-header">
-            <h3>Component Architecture</h3>
+            <h3>Color Components & Bit Depths</h3>
           </div>
           <div id="components-summary" class="components-summary">
             <!-- Dynamically populated -->
@@ -356,54 +443,55 @@
       </div>
     </section>
 
-    <!-- Tab 6: Box & Marker Tree -->
-    <section id="tab-boxes" class="tab-pane">
+    <!-- Tab 5: Bitstream Tree & Hex -->
+    <section id="tab-bitstream" class="tab-pane">
       <div class="split-view">
+        <!-- Tree Column -->
         <div class="tree-panel card">
           <div class="panel-header">
-            <h3>Bitstream Hierarchy Tree</h3>
-            <input type="text" id="tree-search" class="tree-search-input" placeholder="Filter boxes or markers...">
+            <h3>Bitstream Hierarchy</h3>
+            <input type="text" id="tree-search" class="tree-search-input" placeholder="Search markers or boxes...">
           </div>
           <div id="bitstream-tree" class="bitstream-tree">
             <!-- Tree generated dynamically -->
           </div>
         </div>
 
-        <div class="details-panel card">
+        <!-- Details & Hex Column -->
+        <div class="card hex-inspect-card">
           <div class="panel-header">
-            <h3 id="selected-item-title">Item Properties</h3>
-            <span id="selected-item-offset" class="badge badge-neutral">Offset 0x0000</span>
+            <div>
+              <h3 id="selected-item-title">Selected Element</h3>
+              <span id="selected-item-offset" class="badge badge-neutral">Click a box or marker on the left</span>
+            </div>
+            <div class="hex-nav">
+              <button id="btn-hex-prev" class="btn btn-secondary btn-sm">◄ Prev 1KB</button>
+              <span id="hex-range-label" class="badge badge-neutral">Bytes 0 – 1024</span>
+              <button id="btn-hex-next" class="btn btn-secondary btn-sm">Next 1KB ►</button>
+            </div>
           </div>
+
           <div id="selected-item-body" class="selected-item-body">
-            <p class="placeholder-text">Click any box or codestream marker on the left to inspect its fields.</p>
+            <!-- JSON properties -->
+          </div>
+
+          <div class="hex-section-header">
+            <span>Raw Byte Stream (Hex & ASCII View)</span>
+            <span class="hex-hint">Selected box/marker highlighted in amber</span>
+          </div>
+          <div id="hex-viewer" class="hex-viewer">
+            <!-- Hex dump rendered dynamically -->
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Tab 7: Raw Hex Inspector -->
-    <section id="tab-hex" class="tab-pane">
-      <div class="card">
-        <div class="panel-header">
-          <h3>Raw Binary Hex Dump</h3>
-          <div class="hex-nav">
-            <button id="btn-hex-prev" class="btn btn-secondary btn-sm">◄ Prev 1 KB</button>
-            <span id="hex-range-label" class="badge badge-neutral">Bytes 0 – 1024</span>
-            <button id="btn-hex-next" class="btn btn-secondary btn-sm">Next 1 KB ►</button>
-          </div>
-        </div>
-        <div id="hex-viewer" class="hex-viewer">
-          <!-- Hex dump rendered dynamically -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Tab 8: Comments & XML Metadata -->
+    <!-- Tab 6: Comments & Metadata -->
     <section id="tab-metadata" class="tab-pane">
       <div class="grid-2col">
         <div class="card">
           <div class="panel-header">
-            <h3>Encoder Comments (COM Markers)</h3>
+            <h3>Encoder Comments (COM Marker Segments)</h3>
           </div>
           <div id="comments-container" class="comments-container">
             <p class="placeholder-text">No comment markers present.</p>
@@ -412,9 +500,137 @@
 
         <div class="card">
           <div class="panel-header">
-            <h3>XML Metadata / Dublin Core</h3>
+            <h3>Embedded XML / Dublin Core / XMP</h3>
           </div>
           <pre id="xml-content" class="code-block"><code class="xml">No XML box found in file.</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 7: Educational Guide & Reference Handbook -->
+    <section id="tab-guide" class="tab-pane">
+      <div class="card guide-container">
+        <div class="guide-header">
+          <div class="guide-title-wrap">
+            <span class="guide-badge">Architecture & Standard Reference</span>
+            <h2>Understanding the JPEG 2000 Format (ISO/IEC 15444-1)</h2>
+            <p class="guide-subtitle">A comprehensive handbook on wavelets, multiresolution decomposition, progression orders, and EBCOT entropy coding.</p>
+          </div>
+        </div>
+
+        <div class="guide-grid">
+          <!-- Guide Chapter 1 -->
+          <article class="guide-card">
+            <div class="guide-card-icon">🌊</div>
+            <h3>1. Discrete Wavelet Transform (DWT) vs DCT</h3>
+            <p>Unlike legacy JPEG which divides images into $8 \times 8$ blocks resulting in visible blocking artifacts at high compression, JPEG 2000 applies a <strong>full-frame Discrete Wavelet Transform</strong>.</p>
+            <ul>
+              <li><strong>Mallat Octave Decomposition:</strong> Recursively splits the lowest frequency subband into four frequency orientations:
+                <ul>
+                  <li><code>LL</code>: Low-pass horizontal & vertical (Approximation)</li>
+                  <li><code>HL</code>: High-pass horizontal, low-pass vertical (Vertical edges)</li>
+                  <li><code>LH</code>: Low-pass horizontal, high-pass vertical (Horizontal edges)</li>
+                  <li><code>HH</code>: High-pass horizontal & vertical (Diagonal textures)</li>
+                </ul>
+              </li>
+              <li><strong>Zero Blocking Artifacts:</strong> Energy is concentrated into wavelet coefficients across scales, producing smooth, natural degradation rather than grid squares.</li>
+            </ul>
+          </article>
+
+          <!-- Guide Chapter 2 -->
+          <article class="guide-card">
+            <div class="guide-card-icon">⚖️</div>
+            <h3>2. Lossless 5/3 vs Lossy 9/7 Wavelets</h3>
+            <p>JPEG 2000 defines two standard wavelet filters specified in the <code>COD</code> marker segment:</p>
+            <ul>
+              <li><strong>Le Gall 5/3 (Reversible):</strong> Integer-to-integer filter. Used with the Reversible Component Transform (RCT). Guarantees <strong>mathematically bit-exact reconstruction</strong> with zero loss. Used in medical imaging, archiving, and remote sensing.</li>
+              <li><strong>Daubechies CDF 9/7 (Irreversible):</strong> Floating-point filter. Used with the Irreversible Component Transform (ICT). Delivers exceptional compression efficiency and high visual SNR at low bitrates.</li>
+            </ul>
+          </article>
+
+          <!-- Guide Chapter 3 -->
+          <article class="guide-card">
+            <div class="guide-card-icon">📈</div>
+            <h3>3. Progression Orders & Scalability</h3>
+            <p>JPEG 2000 organizes bitstream packets using 5 progression orders, enabling different extraction paradigms without re-encoding:</p>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Name</th>
+                    <th>Optimal Use Case</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>LRCP</code></td>
+                    <td>Layer-Resolution-Component-Position</td>
+                    <td>Progressive quality / SNR streaming. Whole image appears blurry then sharpens.</td>
+                  </tr>
+                  <tr>
+                    <td><code>RLCP</code></td>
+                    <td>Resolution-Layer-Component-Position</td>
+                    <td>Progressive resolution. Perfect for quick thumbnails and zoom tiers.</td>
+                  </tr>
+                  <tr>
+                    <td><code>RPCL</code></td>
+                    <td>Resolution-Position-Component-Layer</td>
+                    <td>Spatial and resolution streaming. Commonly used in web GIS and map viewing.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PCRL</code></td>
+                    <td>Position-Component-Resolution-Layer</td>
+                    <td>Interactive spatial panning across large images.</td>
+                  </tr>
+                  <tr>
+                    <td><code>CPRL</code></td>
+                    <td>Component-Position-Resolution-Layer</td>
+                    <td>Displays complete color channel before subsequent channels.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <!-- Guide Chapter 4 -->
+          <article class="guide-card">
+            <div class="guide-card-icon">🧩</div>
+            <h3>4. EBCOT & Fractional Bitplanes</h3>
+            <p><strong>EBCOT</strong> (Embedded Block Coding with Optimal Truncation) partitions each wavelet subband into small autonomous <strong>code-blocks</strong> (typically $64 \times 64$ or $32 \times 32$ pixels).</p>
+            <p>Each bitplane is encoded across 3 fractional passes using context-adaptive MQ arithmetic coding:</p>
+            <ol>
+              <li><strong>Significance Propagation Pass:</strong> Encodes coefficients that are not yet significant but have significant neighbors.</li>
+              <li><strong>Magnitude Refinement Pass:</strong> Refines the bits of coefficients that became significant in previous bitplanes.</li>
+              <li><strong>Cleanup Pass:</strong> Encodes the remaining insignificant coefficients using run-length and context coding.</li>
+            </ol>
+          </article>
+
+          <!-- Guide Chapter 5 -->
+          <article class="guide-card">
+            <div class="guide-card-icon">🛡️</div>
+            <h3>5. The 6 Error-Resilience Modes</h3>
+            <p>JPEG 2000 supports granular mode switches in the <code>COD</code> / <code>COC</code> marker to enhance speed or robustness over unreliable transmission channels:</p>
+            <ul>
+              <li><code>0x01 BYPASS (Lazy coding):</code> Bypasses arithmetic coding during refinement passes, improving compression throughput by up to 50%.</li>
+              <li><code>0x02 RESET:</code> Resets arithmetic context probabilities to uniform at the boundary of each coding pass.</li>
+              <li><code>0x04 TERMINATE:</code> Forces termination of the arithmetic codeword at the end of every pass.</li>
+              <li><code>0x08 CAUSAL:</code> Restricts context modeling to scan lines above, preventing dependency across coding passes.</li>
+              <li><code>0x10 PREDICTABLE:</code> Inserts predictable termination patterns for bitstream error detection.</li>
+              <li><code>0x20 SEGSYM:</code> Inserts a special 4-symbol sequence (<code>1010</code> = <code>0x0A</code>) at bitplane pass ends to detect transmission corruption.</li>
+            </ul>
+          </article>
+
+          <!-- Guide Chapter 6 -->
+          <article class="guide-card">
+            <div class="guide-card-icon">📦</div>
+            <h3>6. JP2 Box Containers vs Raw J2K</h3>
+            <p>JPEG 2000 files exist in two primary flavors:</p>
+            <ul>
+              <li><strong>JP2 Box Container (<code>.jp2</code>):</strong> Uses ISO base media box packaging (start signature <code>jP\040\040</code>). Stores color profiles (<code>colr</code>, ICC profiles), channel definitions (<code>cdef</code>), capture resolutions (<code>resc</code>), and XML metadata.</li>
+              <li><strong>Raw J2K Codestream (<code>.j2k</code>, <code>.jpc</code>):</strong> Pure compressed bitstream starting with the <code>SOC</code> marker (<code>0xFF4F</code>). Contains zero file-level metadata overhead; used in streaming protocols, medical DICOM encapsulation, and video (DCI).</li>
+            </ul>
+          </article>
         </div>
       </div>
     </section>

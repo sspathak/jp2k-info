@@ -206,14 +206,30 @@ def main():
         return
 
     file_path = args.file
-    if not os.path.exists(file_path):
-        print(f"{C_RED}Error:{C_RESET} File '{file_path}' does not exist.", file=sys.stderr)
-        sys.exit(1)
+    if file_path.startswith(('http://', 'https://')):
+        import urllib.request
+        print(f"{C_CYAN}Fetching remote file:{C_RESET} {file_path} ...")
+        try:
+            req = urllib.request.Request(
+                file_path,
+                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) jp2k-info/1.0'}
+            )
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = resp.read()
+            filename = os.path.basename(file_path.split('?')[0]) or 'remote.jp2'
+        except Exception as e:
+            print(f"{C_RED}Error fetching URL:{C_RESET} {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        if not os.path.exists(file_path):
+            print(f"{C_RED}Error:{C_RESET} File '{file_path}' does not exist.", file=sys.stderr)
+            sys.exit(1)
 
-    with open(file_path, "rb") as f:
-        data = f.read()
+        with open(file_path, "rb") as f:
+            data = f.read()
+        filename = os.path.basename(file_path)
 
-    jp2_parser = JPEG2000Parser(data, os.path.basename(file_path))
+    jp2_parser = JPEG2000Parser(data, filename)
     res = jp2_parser.parse()
 
     if args.command == "dump":

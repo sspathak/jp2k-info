@@ -105,6 +105,13 @@ class TestJPEG2000Parser(unittest.TestCase):
         self.assertIn("# JPEG 2000 Encoding Analysis", md)
         self.assertIn("Mathematically Lossless", md)
 
+    def test_url_cli_support(self):
+        import subprocess, sys
+        # Test CLI help and command options
+        result = subprocess.run([sys.executable, "-m", "jp2k_info.cli", "--help"], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("JPEG 2000", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
