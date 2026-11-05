@@ -26,31 +26,31 @@ A complete toolchain and interactive web application designed to open, inspect, 
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start with Pixi
 
-### 1. Launch the Interactive Web Application
+The project uses [Pixi](https://pixi.sh) to reproducibly manage all Python dependencies and OpenJPEG system binaries across Linux, macOS, and Windows.
 
 ```bash
-# Start the web app and open in browser
-./jp2k-info serve
+# Install environment (fetches Python & OpenJPEG tools automatically)
+pixi install
 
-# Or specify a custom port
-./jp2k-info serve --port 8080 --no-browser
+# Run the unit test suite
+pixi run test
+
+# Launch the interactive web application
+pixi run serve
+
+# Or run terminal CLI commands
+pixi run dump samples/lossy_9_7_multitile.jp2
+pixi run json samples/lossless_5_3.jp2
+pixi run markdown samples/multilayer_progressive.jp2
 ```
 
-Open `http://localhost:8000` (or the printed port) in your browser. You can drag and drop any `.jp2` or `.j2k` file directly into the browser, or select from the pre-loaded sample showcase!
-
-### 2. Inspect JPEG 2000 Files via Terminal CLI
+Alternatively, you can run `./jp2k-info` directly using your local Python environment:
 
 ```bash
-# Full colorful terminal encoding summary
-./jp2k-info dump samples/lossy_9_7_multitile.jp2
-
-# Export structured metadata as JSON
-./jp2k-info json samples/lossless_5_3.jp2 -o metadata.json
-
-# Generate GitHub-flavored Markdown report
-./jp2k-info markdown samples/multilayer_progressive.jp2 -o report.md
+./jp2k-info serve
+./jp2k-info dump samples/lossless_5_3.jp2
 ```
 
 ---

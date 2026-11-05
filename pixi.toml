@@ -1,0 +1,18 @@
+[workspace]
+name = "jp2k-info"
+version = "1.0.0"
+description = "JPEG 2000 Deep Inspector & Encoding Analyzer (ISO/IEC 15444-1)"
+authors = ["sspathak <suraj.s.pathak@gmail.com>"]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "osx-64", "linux-64", "win-64"]
+
+[dependencies]
+python = ">=3.10"
+openjpeg = "*"
+
+[tasks]
+test = "python -m unittest discover tests"
+serve = "python -m jp2k_info.cli serve"
+dump = "python -m jp2k_info.cli dump"
+json = "python -m jp2k_info.cli json"
+markdown = "python -m jp2k_info.cli markdown"

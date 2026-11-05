@@ -7,7 +7,7 @@ name = "jp2k-info"
 version = "1.0.0"
 description = "JPEG 2000 Deep Inspector & Encoding Analyzer (ISO/IEC 15444-1)"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
     { name = "JPEG 2000 Inspection Suite" }
 ]
@@ -19,3 +19,6 @@ classifiers = [
 
 [project.scripts]
 jp2k-info = "jp2k_info.cli:main"
+
+[tool.setuptools]
+packages = ["jp2k_info"]
