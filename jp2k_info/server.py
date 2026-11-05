@@ -1,5 +1,5 @@
 """
-Lightweight HTTP Server and REST API for JPEG 2000 Inspector Webapp.
+Lightweight HTTP Server and REST API for JPEG2000 info Webapp.
 """
 
 import os
@@ -287,7 +287,7 @@ def start_server(port: int = 8000, open_browser: bool = True):
 
     url = f"http://localhost:{actual_port}"
 
-    print(f"\n🚀 JPEG 2000 Inspector Web App running at:")
+    print(f"\n🚀 JPEG2000 info Web App running at:")
     print(f"   👉 {url}\n")
     print("Press Ctrl+C to stop the server.\n")
 

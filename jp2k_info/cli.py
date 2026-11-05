@@ -32,7 +32,7 @@ def format_bytes(num_bytes: int) -> str:
 def print_banner():
     banner = f"""
 {C_CYAN}{C_BOLD}╔═════════════════════════════════════════════════════════════════════════╗
-║   JPEG 2000 Deep Inspector & Encoding Analyzer (ISO/IEC 15444-1)        ║
+║   JPEG2000 info - Encoding Metadata Analyzer (ISO/IEC 15444-1)          ║
 ╚═════════════════════════════════════════════════════════════════════════╝{C_RESET}
 """
     print(banner)
@@ -172,7 +172,7 @@ def generate_markdown_report(res: Dict[str, Any]) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="JPEG 2000 Encoding Metadata Analyzer & Inspector",
+        description="JPEG2000 info - Encoding Metadata Analyzer",
         prog="jp2k-info"
     )
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")

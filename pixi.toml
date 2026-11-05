@@ -1,7 +1,7 @@
 [workspace]
 name = "jp2k-info"
 version = "1.0.0"
-description = "JPEG 2000 Deep Inspector & Encoding Analyzer (ISO/IEC 15444-1)"
+description = "JPEG2000 info - Encoding Metadata Analyzer (ISO/IEC 15444-1)"
 authors = ["sspathak <suraj.s.pathak@gmail.com>"]
 channels = ["conda-forge"]
 platforms = ["osx-arm64", "osx-64", "linux-64", "win-64"]

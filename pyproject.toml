@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "jp2k-info"
 version = "1.0.0"
-description = "JPEG 2000 Deep Inspector & Encoding Analyzer (ISO/IEC 15444-1)"
+description = "JPEG2000 info - Encoding Metadata Analyzer (ISO/IEC 15444-1)"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [

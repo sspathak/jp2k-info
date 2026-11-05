@@ -110,7 +110,7 @@ class TestJPEG2000Parser(unittest.TestCase):
         # Test CLI help and command options
         result = subprocess.run([sys.executable, "-m", "jp2k_info.cli", "--help"], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0)
-        self.assertIn("JPEG 2000", result.stdout)
+        self.assertIn("JPEG2000 info", result.stdout)
 
 
 if __name__ == "__main__":

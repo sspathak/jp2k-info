@@ -1,30 +1,38 @@
-# JPEG 2000 Deep Inspector & Encoding Analyzer (ISO/IEC 15444-1)
+# JPEG2000 info - Encoding Metadata Analyzer (ISO/IEC 15444-1)
 
 [![Deploy to GitHub Pages](https://github.com/sspathak/jp2k-info/actions/workflows/pages.yml/badge.svg)](https://github.com/sspathak/jp2k-info/actions/workflows/pages.yml)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=flat&logo=github)](https://sspathak.github.io/jp2k-info/)
 
 A complete toolchain and interactive web application designed to open, inspect, and analyze the encoding parameters of **JPEG 2000** files (`.jp2`, `.j2k`, `.jpc`, `.jpx`).
 
-👉 **Live Interactive Web App:** [https://sspathak.github.io/jp2k-info/](https://sspathak.github.io/jp2k-info/)
-*(Runs 100% client-side in the browser via JavaScript binary parsing — no server required!)*
+👉 **Live Interactive Web App:** [https://sspathak.github.io/jp2k-info/](https://sspathak.github.io/jp2k-info/)  
+*(Runs 100% client-side in the browser via native JavaScript binary parsing — no server required!)*
 
 ---
 
 ## 🌟 Highlights & Key Capabilities
 
-- **Dual Mode:** Use the interactive **Web Application** or the fast, colorized **Python CLI** tool (`./jp2k-info`).
-- **Comprehensive Format Support:** Handles both standard **JP2 Box Containers** (`jP  `, `ftyp`, `jp2h`, `ihdr`, `bpcc`, `colr`, `pclr`, `cmap`, `cdef`, `res `, `resc`, `resd`, `jp2c`, `xml `, `uuid`, `cprt`) and standalone **Raw J2K Codestreams** (`SOC`, `SIZ`, `COD`, `COC`, `QCD`, `QCC`, `RGN`, `POC`, `TLM`, `PLM`, `PLT`, `PPM`, `PPT`, `SOP`, `EPH`, `CRG`, `COM`, `SOT`, `SOD`, `EOC`).
+- **Flexible Input Sources:**
+  - **Load from URL:** Provide any direct HTTP or HTTPS link to a `.jp2` / `.j2k` file.
+  - **Local File Upload:** Drag-and-drop or select any local JPEG 2000 file.
+  - **Curated Test Suite:** Instantly switch between built-in samples demonstrating key JPEG 2000 profiles.
+- **Engine Transparency:**
+  - **OpenJPEG 2.5.4:** Used by the local backend server (`./jp2k-info serve`) and terminal CLI tool for full C-library decoding and verification.
+  - **ClientJP2Parser:** Native, zero-dependency browser parser using `DataView` for lightning-fast client-side analysis (powers GitHub Pages static deployment).
+- **Tabbed Interactive Educational Guide:**
+  - Includes dedicated tabs and embedded vector SVG diagrams explaining:
+    1. **Wavelets: DWT vs DCT:** Frequency subbands and energy compaction vs block boundary artifacts.
+    2. **5/3 vs 9/7 Lifting Factorization:** Integer reversible vs floating-point Daubechies filter banks.
+    3. **Progression Orders:** LRCP, RLCP, RPCL, PCRL, CPRL packet layout sequences.
+    4. **EBCOT & Coding Passes:** Bitplane scanning, Significance Propagation, Magnitude Refinement, and Cleanup.
+    5. **Error-Resilience Modes:** Arithmetic coder bypass, restart contexts, termination, and SOP/EPH markers.
+    6. **Box Architecture vs Codestream:** JP2 file container structure (`jP`, `ftyp`, `jp2h`, `ihdr`, `colr`, `jp2c`).
+    7. **Engines & Tools:** OpenJPEG, Grok, Kakadu, and ClientJP2Parser comparison.
+- **Rich Contextual Tooltips:** Floating tooltips across every technical acronym, marker code, and parameter explaining its exact ISO/IEC 15444-1 meaning.
 - **Interactive 2D DWT Mallat Wavelet Explorer:** Interactive visual map of the discrete wavelet octave decomposition tree ($LL_{N_L}, HL_i, LH_i, HH_i$). Hover or click any subband to inspect its orientation, frequency band, exact pixel dimensions, and calculated quantizer step size $\Delta_b$ / exponent $\epsilon_b$.
 - **Interactive Tile Grid Visualizer:** Visualizes spatial tile partitions ($X_{Tsiz} \times Y_{Tsiz}$) against the reference grid canvas ($X_{siz} \times Y_{siz}$), with tile bounding boxes, SOT offsets, and bitstream payload byte lengths.
-- **Code-block & Error Resilience Matrix:** Inspects code-block dimensions ($64 \times 64$, etc.), SOP (Start of Packet), EPH (End of Packet Header), and all 6 SPcod mode switch flags:
-  1. *Selective arithmetic coding bypass* (Lazy mode)
-  2. *Reset context probabilities on coding pass boundaries*
-  3. *Termination on each coding pass*
-  4. *Vertically causal context*
-  5. *Predictable termination*
-  6. *Segmentation symbols* (0x0A)
-- **Quantization & Dynamic Range Matrix:** Guard bits ($G$), quantization styles (Reversible 5/3 No-Quant, Scalar Derived, Scalar Expounded), step size formulas, and per-subband dynamic range.
-- **Image & Channel Inspector:** Decoded raster preview with channel separation toggles (Composite RGB, Red only, Green only, Blue only, Luminance $Y$) and tile outline overlays.
+- **Code-block & Error Resilience Matrix:** Inspects code-block dimensions ($64 \times 64$, etc.), SOP (Start of Packet), EPH (End of Packet Header), and all 6 SPcod mode switch flags.
+- **Image & Channel Viewer:** Decoded raster preview with channel separation toggles (Composite RGB, Red only, Green only, Blue only, Luminance $Y$) and tile outline overlays.
 - **Hierarchical Bitstream & Box Tree:** Collapsible tree view showing the hierarchy of every box and codestream marker segment with offsets and lengths.
 - **Synchronized Raw Hex Viewer:** Live hex dump with pagination and automatic byte highlighting matching the selected box or marker segment.
 - **Metadata & Comment Extraction:** Latin-1/UTF-8 `COM` encoder comments, embedded Dublin Core / XMP `xml ` boxes, and `uuid` tags.

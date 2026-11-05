@@ -1,5 +1,5 @@
 /**
- * Main Application Controller for JPEG 2000 Inspector Web App.
+ * Main Application Controller for JPEG2000 info Web App.
  * Handles UI interactions, URL loading, drag-and-drop, and visual updates.
  */
 
@@ -42,11 +42,16 @@ class App {
     this.tabBtns = document.querySelectorAll('.tab-btn');
     this.tabPanes = document.querySelectorAll('.tab-pane');
 
+    // Guide subtabs
+    this.guideSubtabs = document.querySelectorAll('.guide-subtab');
+    this.guideSubpanes = document.querySelectorAll('.guide-subpane');
+
     // Hero metrics
     this.fileNameEl = document.getElementById('file-name');
     this.badgeFormatEl = document.getElementById('badge-format');
     this.badgeModeEl = document.getElementById('badge-mode');
     this.badgeSizeEl = document.getElementById('badge-size');
+    this.badgeEngineEl = document.getElementById('badge-engine');
     this.filePathSubEl = document.getElementById('file-path-sub');
 
     this.metricDim = document.getElementById('metric-dim');
@@ -227,6 +232,71 @@ class App {
     this.treeSearch.addEventListener('input', (e) => {
       this.filterTree(e.target.value);
     });
+
+    // Guide subtab switcher
+    this.guideSubtabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetId = tab.getAttribute('data-subtab');
+        this.guideSubtabs.forEach(t => t.classList.remove('active'));
+        this.guideSubpanes.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(targetId)?.classList.add('active');
+      });
+    });
+
+    // Initialize global floating tooltips
+    this.initTooltips();
+  }
+
+  initTooltips() {
+    let tip = document.getElementById('global-tooltip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.id = 'global-tooltip';
+      tip.className = 'global-tooltip hidden';
+      document.body.appendChild(tip);
+    }
+
+    const positionTip = (target) => {
+      const tipText = target.getAttribute('data-tooltip');
+      if (!tipText) return;
+      tip.textContent = tipText;
+      tip.classList.remove('hidden');
+
+      const targetRect = target.getBoundingClientRect();
+      const tipRect = tip.getBoundingClientRect();
+
+      let top = targetRect.top - tipRect.height - 8;
+      if (top < 10) {
+        top = targetRect.bottom + 8;
+      }
+      let left = targetRect.left + (targetRect.width / 2) - (tipRect.width / 2);
+      if (left < 10) left = 10;
+      if (left + tipRect.width > window.innerWidth - 10) {
+        left = window.innerWidth - tipRect.width - 10;
+      }
+
+      tip.style.top = `${top + window.scrollY}px`;
+      tip.style.left = `${left + window.scrollX}px`;
+    };
+
+    document.addEventListener('mouseover', (e) => {
+      const target = e.target.closest('[data-tooltip]');
+      if (target) {
+        positionTip(target);
+      }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      const target = e.target.closest('[data-tooltip]');
+      if (target) {
+        tip.classList.add('hidden');
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      tip.classList.add('hidden');
+    }, { passive: true });
   }
 
   async loadInitialSample() {
@@ -244,6 +314,7 @@ class App {
         const metaResp = await fetch(`/api/sample_meta/${sampleId}`);
         if (metaResp.ok) {
           const meta = await metaResp.json();
+          meta._engine = 'OpenJPEG 2.5.4 & Python';
           const binResp = await fetch(`/api/sample/${sampleId}`);
           const buffer = await binResp.arrayBuffer();
           this.currentRawBytes = new Uint8Array(buffer);
@@ -277,6 +348,7 @@ class App {
       this.currentRawBytes = new Uint8Array(buf);
       const parser = new ClientJP2Parser(buf, fname);
       const meta = parser.parse();
+      meta._engine = 'ClientJP2Parser (zero-dep)';
       meta.preview_url = `./samples/${baseName}.png`;
       this.applyData(meta);
     } catch (err) {
@@ -303,6 +375,7 @@ class App {
           const apiResp = await fetch(`/api/fetch_url?url=${encodeURIComponent(url)}`);
           if (apiResp.ok) {
             meta = await apiResp.json();
+            meta._engine = 'OpenJPEG 2.5.4 & Python';
             // Also fetch raw buffer for hex viewer
             const binResp = await fetch(url);
             if (binResp.ok) {
@@ -327,6 +400,7 @@ class App {
         const cleanName = url.split('/').pop().split('?')[0] || 'remote_image.jp2';
         const parser = new ClientJP2Parser(rawBuffer, cleanName);
         meta = parser.parse();
+        meta._engine = 'ClientJP2Parser (zero-dep)';
         meta.preview_url = null;
       }
 
@@ -366,6 +440,7 @@ class App {
           });
           if (uploadResp.ok) {
             meta = await uploadResp.json();
+            meta._engine = 'OpenJPEG 2.5.4 & Python';
           }
         } catch (_) {}
       }
@@ -374,6 +449,7 @@ class App {
       if (!meta || meta.error) {
         const parser = new ClientJP2Parser(buffer, file.name);
         meta = parser.parse();
+        meta._engine = 'ClientJP2Parser (zero-dep)';
         meta.preview_url = null;
       }
 
@@ -395,6 +471,17 @@ class App {
     this.badgeModeEl.textContent = s.compression_mode;
     this.badgeModeEl.className = `badge has-tooltip ${s.is_lossless ? 'badge-lossless' : 'badge-lossy'}`;
     this.badgeSizeEl.textContent = this.formatBytes(meta.file_size);
+
+    if (this.badgeEngineEl) {
+      const engineName = meta._engine || 'ClientJP2Parser';
+      this.badgeEngineEl.textContent = `Engine: ${engineName}`;
+      this.badgeEngineEl.setAttribute(
+        'data-tooltip',
+        engineName.includes('OpenJPEG')
+          ? 'Decoded and analyzed via OpenJPEG 2.5.4 C library backend & Python codestream parser'
+          : 'Decoded and analyzed in-browser with zero dependencies using native JavaScript DataView parser'
+      );
+    }
 
     const socMarker = meta.codestream_markers?.find(m => m.code === 'SOC');
     this.filePathSubEl.textContent = socMarker ?

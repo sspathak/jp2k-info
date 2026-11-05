@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JPEG 2000 Deep Inspector & Encoding Analyzer</title>
+  <title>JPEG2000 info - Deep Encoding Analyzer</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,8 +24,14 @@
     <div class="header-brand">
       <div class="logo-mark">J2K</div>
       <div class="brand-text">
-        <h1>JPEG 2000 Inspector</h1>
-        <span class="badge-iso">ISO/IEC 15444-1</span>
+        <div class="brand-title-row">
+          <h1>JPEG2000 info</h1>
+          <span class="badge-iso">ISO/IEC 15444-1</span>
+        </div>
+        <div class="engine-badge has-tooltip" data-tooltip="Powered by OpenJPEG 2.5.4 (C library) on backend/CLI and ClientJP2Parser (native JavaScript binary parser) in the browser.">
+          <span class="engine-dot"></span>
+          <span>Engine: OpenJPEG 2.5.4 &amp; Native Parser</span>
+        </div>
       </div>
     </div>
 
@@ -78,7 +84,7 @@
           <option value="xml_and_metadata">XML Metadata & Copyright Box (Dublin Core)</option>
           <option value="metadata_comment">Encoder Signature Comments (COM Marker)</option>
         </select>
-        <span class="source-hint">Instant pre-loaded JPEG 2000 test files</span>
+        <span class="source-hint">Pre-generated test files demonstrating core JPEG 2000 features</span>
       </div>
     </div>
 
@@ -90,7 +96,7 @@
           <input type="url" id="url-input" class="url-input" placeholder="Enter URL to any .jp2 or .j2k file (e.g. https://.../image.jp2)">
         </div>
         <button id="btn-fetch-url" class="btn btn-primary">
-          <span class="btn-text">Fetch & Inspect</span>
+          <span class="btn-text">Fetch &amp; Inspect</span>
           <span class="btn-spinner hidden"></span>
         </button>
       </div>
@@ -110,7 +116,7 @@
           <span>Choose JPEG 2000 File</span>
           <input type="file" id="file-input" accept=".jp2,.j2k,.jpc,.jpx,.jpm,image/jp2" hidden>
         </label>
-        <span class="source-hint">Or simply drag & drop any file anywhere onto this window</span>
+        <span class="source-hint">Or simply drag &amp; drop any file anywhere onto this window</span>
       </div>
     </div>
   </section>
@@ -123,9 +129,10 @@
         <div class="file-ident">
           <h2 id="file-name" class="file-name">lossless_5_3.jp2</h2>
           <div class="badges-row">
-            <span id="badge-format" class="badge badge-container has-tooltip" data-tooltip="File wrapper type: JP2 Box Container conforms to ISO/IEC 15444-1 Annex I with box structure.">JP2 Container</span>
-            <span id="badge-mode" class="badge badge-lossless has-tooltip" data-tooltip="Compression reversibility: Mathematically Lossless indicates bit-exact reconstruction using Le Gall 5/3 filter and RCT.">Mathematically Lossless</span>
+            <span id="badge-format" class="badge badge-container has-tooltip" data-tooltip="Container format: JP2 box container encapsulation conforming to ISO/IEC 15444-1 Annex I.">JP2 Container</span>
+            <span id="badge-mode" class="badge badge-lossless has-tooltip" data-tooltip="Compression mode: Mathematically Lossless indicates bit-exact reconstruction using Le Gall 5/3 filter and Reversible Color Transform (RCT).">Mathematically Lossless</span>
             <span id="badge-size" class="badge badge-neutral">4.7 KB</span>
+            <span id="badge-engine" class="badge badge-engine has-tooltip" data-tooltip="Parsing Engine: The active decoder/analyzer reading this codestream.">Parsed via ClientJP2Parser</span>
           </div>
         </div>
         <div id="file-path-sub" class="file-offset-tag">Codestream offset: 0x0055</div>
@@ -137,7 +144,7 @@
         <div class="spec-group">
           <div class="group-title">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span>Geometry & Channels</span>
+            <span>Geometry &amp; Channels</span>
           </div>
           <div class="spec-items">
             <div class="spec-item">
@@ -146,7 +153,7 @@
               <span id="metric-mp" class="sub">0.07 Megapixels</span>
             </div>
             <div class="spec-item">
-              <span class="label">Components & Depth</span>
+              <span class="label has-tooltip" data-tooltip="Bit depth per sample and whether samples are signed (2's complement) or unsigned.">Precision &amp; Color</span>
               <span id="metric-depth" class="value">8-bit Unsigned</span>
               <span id="metric-color" class="sub">sRGB (3 components)</span>
             </div>
@@ -161,13 +168,13 @@
           </div>
           <div class="spec-items">
             <div class="spec-item">
-              <span class="label">Wavelet Filter</span>
-              <span id="metric-wavelet" class="value has-tooltip" data-tooltip="Wavelet filter specified in SPcod: Le Gall 5/3 integer filter ensures bit-exact lossless reconstruction; Daubechies 9/7 floating-point filter maximizes lossy compression.">5/3 Reversible</span>
+              <span class="label has-tooltip" data-tooltip="Wavelet filter specified in SPcod: Le Gall 5/3 integer filter ensures bit-exact lossless reconstruction; Daubechies 9/7 floating-point filter maximizes lossy compression.">Wavelet Filter</span>
+              <span id="metric-wavelet" class="value has-tooltip" data-tooltip="Le Gall 5/3 integer wavelet is mathematically lossless. Daubechies 9/7 floating-point wavelet is irreversible (lossy).">5/3 Reversible</span>
               <span id="metric-wavelet-sub" class="sub">Le Gall 5/3 Integer</span>
             </div>
             <div class="spec-item">
-              <span class="label">Color Transform (MCT)</span>
-              <span id="metric-mct" class="value has-tooltip" data-tooltip="Multiple Component Transform: RCT (Reversible Color Transform) for integer RGB-to-YUV; ICT (Irreversible Color Transform) for lossy YCbCr.">RCT Transform</span>
+              <span class="label has-tooltip" data-tooltip="Multiple Component Transform (MCT): RCT (Reversible Color Transform) for integer RGB-to-YUV; ICT (Irreversible Color Transform) for lossy YCbCr.">Color Transform (MCT)</span>
+              <span id="metric-mct" class="value has-tooltip" data-tooltip="RCT: Y = floor((R+2G+B)/4), U = B-G, V = R-G. Lossless and reversible.">RCT Transform</span>
               <span id="metric-ratio" class="sub">Ratio: 41.5:1 (0.58 bpp)</span>
             </div>
           </div>
@@ -181,12 +188,12 @@
           </div>
           <div class="spec-items">
             <div class="spec-item">
-              <span class="label">Progression Order</span>
-              <span id="metric-prog" class="value has-tooltip" data-tooltip="Packet ordering: LRCP (Layer, Resolution, Component, Position) allows progressive quality streaming; RLCP allows progressive resolution thumbnailing.">LRCP</span>
+              <span class="label has-tooltip" data-tooltip="Progression order: Defines the interleaving sequence of codestream packets across Layers (L), Resolutions (R), Components (C), and Positions (P).">Progression Order</span>
+              <span id="metric-prog" class="value has-tooltip" data-tooltip="LRCP progression prioritizes quality layers first, allowing the file to load blurry and progressively sharpen across the entire image.">LRCP</span>
               <span id="metric-prog-sub" class="sub">Progressive by Quality</span>
             </div>
             <div class="spec-item">
-              <span class="label">Hierarchy Levels</span>
+              <span class="label has-tooltip" data-tooltip="Decomposition levels in discrete wavelet transform (DWT). N levels create N+1 resolution scales.">Hierarchy Levels</span>
               <span id="metric-decomp" class="value">5 DWT Levels</span>
               <span id="metric-layers" class="sub">1 Quality Layer</span>
             </div>
@@ -197,17 +204,17 @@
         <div class="spec-group">
           <div class="group-title">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            <span>Tiling & Code-Blocks</span>
+            <span>Tiling &amp; Code-Blocks</span>
           </div>
           <div class="spec-items">
             <div class="spec-item">
-              <span class="label">Spatial Tiles</span>
+              <span class="label has-tooltip" data-tooltip="Number of spatial tiles into which the reference image is partitioned. Each tile is compressed independently.">Spatial Tiles</span>
               <span id="metric-tiles" class="value">1 Tile</span>
               <span id="metric-tile-dim" class="sub">256 × 256 px</span>
             </div>
             <div class="spec-item">
-              <span class="label">Code-Block Size</span>
-              <span id="metric-cb-dim" class="value has-tooltip" data-tooltip="Dimensions of code-blocks used for EBCOT entropy coding (defined as 2^(xcb+2) × 2^(ycb+2)). Max area is 4096.">64 × 64 px</span>
+              <span class="label has-tooltip" data-tooltip="Code-block dimensions for EBCOT entropy coding (2^(xcb+2) × 2^(ycb+2)). Max area is 4096.">Code-Block Size</span>
+              <span id="metric-cb-dim" class="value has-tooltip" data-tooltip="Code-blocks are autonomous entropy coding blocks processed by EBCOT with bitplane coding passes.">64 × 64 px</span>
               <span id="metric-scales" class="sub">6 Resolution Scales</span>
             </div>
           </div>
@@ -218,22 +225,22 @@
     <!-- Navigation Tabs -->
     <nav class="nav-tabs">
       <button class="tab-btn active" data-tab="tab-dwt">
-        <span>🌊 Wavelet & DWT</span>
+        <span>🌊 Wavelet &amp; DWT</span>
       </button>
       <button class="tab-btn" data-tab="tab-tiles">
         <span>🪟 Tile Geometry</span>
       </button>
       <button class="tab-btn" data-tab="tab-modes">
-        <span>⚙️ Modes & Quantization</span>
+        <span>⚙️ Modes &amp; Quantization</span>
       </button>
       <button class="tab-btn" data-tab="tab-preview">
-        <span>🖼️ Image & Channels</span>
+        <span>🖼️ Image &amp; Channels</span>
       </button>
       <button class="tab-btn" data-tab="tab-bitstream">
-        <span>📦 Bitstream & Hex</span>
+        <span>📦 Bitstream &amp; Hex</span>
       </button>
       <button class="tab-btn" data-tab="tab-metadata">
-        <span>📝 Comments & XML</span>
+        <span>📝 Comments &amp; XML</span>
       </button>
       <button class="tab-btn tab-guide" data-tab="tab-guide">
         <span>📖 JPEG 2000 Guide</span>
@@ -295,7 +302,7 @@
         <div class="canvas-panel card">
           <div class="panel-header">
             <div>
-              <h3>Canvas Reference Grid & Spatial Tile Partitions</h3>
+              <h3>Canvas Reference Grid &amp; Spatial Tile Partitions</h3>
               <p class="panel-subtitle">Visual map of reference canvas (Xsiz × Ysiz) and tile grid partitions (XTsiz × YTsiz).</p>
             </div>
           </div>
@@ -339,25 +346,25 @@
         <!-- Coding Styles & Error Resilience -->
         <div class="card">
           <div class="panel-header">
-            <h3>Entropy Coding Modes & Error Resilience</h3>
+            <h3>Entropy Coding Modes &amp; Error Resilience</h3>
             <span class="badge badge-info has-tooltip" data-tooltip="Code-block style byte in COD/COC (SPcod parameter) controls the fractional bitplane coder.">SPcod Flags</span>
           </div>
 
           <div class="props-list">
             <div class="prop-row">
-              <span class="prop-name">Code-Block Dimensions:</span>
+              <span class="prop-name has-tooltip" data-tooltip="Dimensions of code-blocks used for EBCOT entropy coding. Standard is 64x64 or 32x32.">Code-Block Dimensions:</span>
               <span id="cb-dims-text" class="prop-val bold">64 × 64 px</span>
             </div>
             <div class="prop-row">
-              <span class="prop-name">Start of Packet (SOP) Markers:</span>
+              <span class="prop-name has-tooltip" data-tooltip="Start of Packet marker segments: 0xFF91 inserted before packet headers to delimit packets and provide packet sequence numbers.">Start of Packet (SOP) Markers:</span>
               <span id="cb-sop-text" class="prop-val">Disabled</span>
             </div>
             <div class="prop-row">
-              <span class="prop-name">End of Packet Header (EPH):</span>
+              <span class="prop-name has-tooltip" data-tooltip="End of Packet Header marker segments: 0xFF92 placed at the end of every packet header before body data.">End of Packet Header (EPH):</span>
               <span id="cb-eph-text" class="prop-val">Disabled</span>
             </div>
             <div class="prop-row">
-              <span class="prop-name">Precinct Partitioning:</span>
+              <span class="prop-name has-tooltip" data-tooltip="Precinct partitions divide resolution levels into subband partitions for localized spatial indexing.">Precinct Partitioning:</span>
               <span id="cb-precincts-text" class="prop-val">Default (32768 × 32768)</span>
             </div>
           </div>
@@ -371,9 +378,9 @@
         <!-- Quantization Matrix -->
         <div class="card">
           <div class="panel-header">
-            <h3>Quantization Matrix & Dynamic Range</h3>
+            <h3>Quantization Matrix &amp; Dynamic Range</h3>
             <div class="header-badges">
-              <span id="badge-quant-style" class="badge badge-info">No Quantization</span>
+              <span id="badge-quant-style" class="badge badge-info has-tooltip" data-tooltip="Quantization style: No Quantization (Reversible 5/3), Scalar Derived, or Scalar Expounded.">No Quantization</span>
               <span id="badge-guard-bits" class="badge badge-neutral has-tooltip" data-tooltip="Number of guard bits (0-7) used in the arithmetic coder to avoid overflow during coefficient accumulation.">2 Guard Bits</span>
             </div>
           </div>
@@ -434,7 +441,7 @@
 
         <div class="details-panel card">
           <div class="panel-header">
-            <h3>Color Components & Bit Depths</h3>
+            <h3>Color Components &amp; Bit Depths</h3>
           </div>
           <div id="components-summary" class="components-summary">
             <!-- Dynamically populated -->
@@ -476,7 +483,7 @@
           </div>
 
           <div class="hex-section-header">
-            <span>Raw Byte Stream (Hex & ASCII View)</span>
+            <span>Raw Byte Stream (Hex &amp; ASCII View)</span>
             <span class="hex-hint">Selected box/marker highlighted in amber</span>
           </div>
           <div id="hex-viewer" class="hex-viewer">
@@ -507,130 +514,386 @@
       </div>
     </section>
 
-    <!-- Tab 7: Educational Guide & Reference Handbook -->
+    <!-- Tab 7: Educational Guide & Reference Handbook (Tabbed System) -->
     <section id="tab-guide" class="tab-pane">
       <div class="card guide-container">
         <div class="guide-header">
           <div class="guide-title-wrap">
-            <span class="guide-badge">Architecture & Standard Reference</span>
-            <h2>Understanding the JPEG 2000 Format (ISO/IEC 15444-1)</h2>
-            <p class="guide-subtitle">A comprehensive handbook on wavelets, multiresolution decomposition, progression orders, and EBCOT entropy coding.</p>
+            <span class="guide-badge">Standard Architecture Reference</span>
+            <h2>JPEG 2000 Technical Guide &amp; Diagrams (ISO/IEC 15444-1)</h2>
+            <p class="guide-subtitle">Interactive handbook with architectural diagrams explaining wavelets, multiresolution decomposition, progression orders, EBCOT, and engines.</p>
           </div>
         </div>
 
-        <div class="guide-grid">
-          <!-- Guide Chapter 1 -->
-          <article class="guide-card">
-            <div class="guide-card-icon">🌊</div>
-            <h3>1. Discrete Wavelet Transform (DWT) vs DCT</h3>
-            <p>Unlike legacy JPEG which divides images into $8 \times 8$ blocks resulting in visible blocking artifacts at high compression, JPEG 2000 applies a <strong>full-frame Discrete Wavelet Transform</strong>.</p>
-            <ul>
-              <li><strong>Mallat Octave Decomposition:</strong> Recursively splits the lowest frequency subband into four frequency orientations:
-                <ul>
-                  <li><code>LL</code>: Low-pass horizontal & vertical (Approximation)</li>
-                  <li><code>HL</code>: High-pass horizontal, low-pass vertical (Vertical edges)</li>
-                  <li><code>LH</code>: Low-pass horizontal, high-pass vertical (Horizontal edges)</li>
-                  <li><code>HH</code>: High-pass horizontal & vertical (Diagonal textures)</li>
-                </ul>
-              </li>
-              <li><strong>Zero Blocking Artifacts:</strong> Energy is concentrated into wavelet coefficients across scales, producing smooth, natural degradation rather than grid squares.</li>
-            </ul>
-          </article>
+        <!-- Guide Inner Tabs Navigation -->
+        <div class="guide-subnav">
+          <button class="guide-subtab active" data-subtab="guide-dwt">🌊 Wavelets: DWT vs DCT</button>
+          <button class="guide-subtab" data-subtab="guide-filters">⚖️ 5/3 vs 9/7 Wavelets</button>
+          <button class="guide-subtab" data-subtab="guide-progression">📈 Progression Orders</button>
+          <button class="guide-subtab" data-subtab="guide-ebcot">🧩 EBCOT &amp; Coding Passes</button>
+          <button class="guide-subtab" data-subtab="guide-modes">🛡️ Error-Resilience Modes</button>
+          <button class="guide-subtab" data-subtab="guide-anatomy">📦 Box vs Codestream</button>
+          <button class="guide-subtab" data-subtab="guide-engines">⚙️ Libraries &amp; Engines</button>
+        </div>
 
-          <!-- Guide Chapter 2 -->
-          <article class="guide-card">
-            <div class="guide-card-icon">⚖️</div>
-            <h3>2. Lossless 5/3 vs Lossy 9/7 Wavelets</h3>
-            <p>JPEG 2000 defines two standard wavelet filters specified in the <code>COD</code> marker segment:</p>
-            <ul>
-              <li><strong>Le Gall 5/3 (Reversible):</strong> Integer-to-integer filter. Used with the Reversible Component Transform (RCT). Guarantees <strong>mathematically bit-exact reconstruction</strong> with zero loss. Used in medical imaging, archiving, and remote sensing.</li>
-              <li><strong>Daubechies CDF 9/7 (Irreversible):</strong> Floating-point filter. Used with the Irreversible Component Transform (ICT). Delivers exceptional compression efficiency and high visual SNR at low bitrates.</li>
-            </ul>
-          </article>
-
-          <!-- Guide Chapter 3 -->
-          <article class="guide-card">
-            <div class="guide-card-icon">📈</div>
-            <h3>3. Progression Orders & Scalability</h3>
-            <p>JPEG 2000 organizes bitstream packets using 5 progression orders, enabling different extraction paradigms without re-encoding:</p>
-            <div class="table-responsive">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Order</th>
-                    <th>Name</th>
-                    <th>Optimal Use Case</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><code>LRCP</code></td>
-                    <td>Layer-Resolution-Component-Position</td>
-                    <td>Progressive quality / SNR streaming. Whole image appears blurry then sharpens.</td>
-                  </tr>
-                  <tr>
-                    <td><code>RLCP</code></td>
-                    <td>Resolution-Layer-Component-Position</td>
-                    <td>Progressive resolution. Perfect for quick thumbnails and zoom tiers.</td>
-                  </tr>
-                  <tr>
-                    <td><code>RPCL</code></td>
-                    <td>Resolution-Position-Component-Layer</td>
-                    <td>Spatial and resolution streaming. Commonly used in web GIS and map viewing.</td>
-                  </tr>
-                  <tr>
-                    <td><code>PCRL</code></td>
-                    <td>Position-Component-Resolution-Layer</td>
-                    <td>Interactive spatial panning across large images.</td>
-                  </tr>
-                  <tr>
-                    <td><code>CPRL</code></td>
-                    <td>Component-Position-Resolution-Layer</td>
-                    <td>Displays complete color channel before subsequent channels.</td>
-                  </tr>
-                </tbody>
-              </table>
+        <!-- Guide Subtab 1: DWT vs DCT -->
+        <div id="guide-dwt" class="guide-subpane active">
+          <div class="guide-content-split">
+            <div class="guide-text">
+              <h3>Discrete Wavelet Transform (DWT) vs Discrete Cosine Transform (DCT)</h3>
+              <p>Legacy JPEG divides an image into fixed $8 \times 8$ blocks and applies the DCT independently to each block. At high compression, quantized high frequencies create severe <strong>blocking artifacts</strong> and edge discontinuities.</p>
+              <p>JPEG 2000 uses a <strong>continuous full-frame Discrete Wavelet Transform</strong> via the Mallat octave pyramid:</p>
+              <ul>
+                <li><strong>Energy Concentration:</strong> DWT concentrates image energy into subbands containing both spatial location and frequency orientation.</li>
+                <li><strong>No Block Boundaries:</strong> Compression degradation manifests as gentle, smooth blurring across the image instead of harsh grid artifacts.</li>
+                <li><strong>Native Multiresolution:</strong> Decoding just the lowest subband yields a pristine $1/2^N$ resolution thumbnail without decompressing full resolution data.</li>
+              </ul>
             </div>
-          </article>
+            <div class="guide-diagram-box">
+              <div class="diagram-title">DCT (Legacy JPEG) vs DWT (JPEG 2000)</div>
+              <svg class="guide-svg" viewBox="0 0 380 220">
+                <!-- DCT Side -->
+                <rect x="20" y="30" width="150" height="150" fill="#1e293b" stroke="#475569" stroke-width="1.5" rx="4"/>
+                <text x="95" y="20" fill="#94a3b8" font-size="11" text-anchor="middle" font-family="sans-serif" font-weight="600">8x8 Block Grid (DCT)</text>
+                <!-- Grid Lines -->
+                <line x1="20" y1="67.5" x2="170" y2="67.5" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2 2"/>
+                <line x1="20" y1="105" x2="170" y2="105" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2 2"/>
+                <line x1="20" y1="142.5" x2="170" y2="142.5" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2 2"/>
+                <line x1="57.5" y1="30" x2="57.5" y2="180" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2 2"/>
+                <line x1="95" y1="30" x2="95" y2="180" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2 2"/>
+                <line x1="132.5" y1="30" x2="132.5" y2="180" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2 2"/>
+                <text x="95" y="198" fill="#f87171" font-size="10" text-anchor="middle" font-family="sans-serif">Blocking artifacts at boundaries</text>
 
-          <!-- Guide Chapter 4 -->
-          <article class="guide-card">
-            <div class="guide-card-icon">🧩</div>
-            <h3>4. EBCOT & Fractional Bitplanes</h3>
-            <p><strong>EBCOT</strong> (Embedded Block Coding with Optimal Truncation) partitions each wavelet subband into small autonomous <strong>code-blocks</strong> (typically $64 \times 64$ or $32 \times 32$ pixels).</p>
-            <p>Each bitplane is encoded across 3 fractional passes using context-adaptive MQ arithmetic coding:</p>
-            <ol>
-              <li><strong>Significance Propagation Pass:</strong> Encodes coefficients that are not yet significant but have significant neighbors.</li>
-              <li><strong>Magnitude Refinement Pass:</strong> Refines the bits of coefficients that became significant in previous bitplanes.</li>
-              <li><strong>Cleanup Pass:</strong> Encodes the remaining insignificant coefficients using run-length and context coding.</li>
-            </ol>
-          </article>
+                <!-- DWT Side -->
+                <rect x="210" y="30" width="150" height="150" fill="#0f172a" stroke="#0284c7" stroke-width="1.5" rx="4"/>
+                <text x="285" y="20" fill="#38bdf8" font-size="11" text-anchor="middle" font-family="sans-serif" font-weight="600">Full-Frame Wavelet (DWT)</text>
+                <!-- Octave Subbands -->
+                <rect x="210" y="30" width="75" height="75" fill="rgba(16, 185, 129, 0.25)" stroke="#10b981" stroke-width="1"/>
+                <rect x="210" y="30" width="37.5" height="37.5" fill="rgba(16, 185, 129, 0.6)" stroke="#10b981" stroke-width="1"/>
+                <text x="228" y="52" fill="#fff" font-size="9" text-anchor="middle" font-family="monospace">LL2</text>
+                <text x="265" y="52" fill="#cbd5e1" font-size="9" text-anchor="middle" font-family="monospace">HL2</text>
+                <text x="228" y="88" fill="#cbd5e1" font-size="9" text-anchor="middle" font-family="monospace">LH2</text>
+                <text x="265" y="88" fill="#cbd5e1" font-size="9" text-anchor="middle" font-family="monospace">HH2</text>
+                <text x="322" y="70" fill="#93c5fd" font-size="11" text-anchor="middle" font-family="monospace" font-weight="bold">HL1</text>
+                <text x="247" y="145" fill="#c084fc" font-size="11" text-anchor="middle" font-family="monospace" font-weight="bold">LH1</text>
+                <text x="322" y="145" fill="#f472b6" font-size="11" text-anchor="middle" font-family="monospace" font-weight="bold">HH1</text>
+                <line x1="285" y1="30" x2="285" y2="180" stroke="#0284c7" stroke-width="1"/>
+                <line x1="210" y1="105" x2="360" y2="105" stroke="#0284c7" stroke-width="1"/>
+                <text x="285" y="198" fill="#38bdf8" font-size="10" text-anchor="middle" font-family="sans-serif">Continuous, smooth degradation</text>
+              </svg>
+            </div>
+          </div>
+        </div>
 
-          <!-- Guide Chapter 5 -->
-          <article class="guide-card">
-            <div class="guide-card-icon">🛡️</div>
-            <h3>5. The 6 Error-Resilience Modes</h3>
-            <p>JPEG 2000 supports granular mode switches in the <code>COD</code> / <code>COC</code> marker to enhance speed or robustness over unreliable transmission channels:</p>
-            <ul>
-              <li><code>0x01 BYPASS (Lazy coding):</code> Bypasses arithmetic coding during refinement passes, improving compression throughput by up to 50%.</li>
-              <li><code>0x02 RESET:</code> Resets arithmetic context probabilities to uniform at the boundary of each coding pass.</li>
-              <li><code>0x04 TERMINATE:</code> Forces termination of the arithmetic codeword at the end of every pass.</li>
-              <li><code>0x08 CAUSAL:</code> Restricts context modeling to scan lines above, preventing dependency across coding passes.</li>
-              <li><code>0x10 PREDICTABLE:</code> Inserts predictable termination patterns for bitstream error detection.</li>
-              <li><code>0x20 SEGSYM:</code> Inserts a special 4-symbol sequence (<code>1010</code> = <code>0x0A</code>) at bitplane pass ends to detect transmission corruption.</li>
-            </ul>
-          </article>
+        <!-- Guide Subtab 2: Filters 5/3 vs 9/7 -->
+        <div id="guide-filters" class="guide-subpane">
+          <div class="guide-content-split">
+            <div class="guide-text">
+              <h3>Le Gall 5/3 (Reversible) vs Daubechies CDF 9/7 (Irreversible)</h3>
+              <p>JPEG 2000 standardizes two mathematical wavelet filters using the <strong>Lifting Scheme</strong>:</p>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Property</th>
+                      <th>Le Gall 5/3 Filter</th>
+                      <th>Daubechies CDF 9/7 Filter</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Filter Type</strong></td>
+                      <td>Integer-to-integer (Biorthogonal)</td>
+                      <td>Floating-point (Biorthogonal)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Reversibility</strong></td>
+                      <td><span class="badge badge-lossless">Bit-exact Lossless</span></td>
+                      <td><span class="badge badge-lossy">Lossy (High efficiency)</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Analysis Lengths</strong></td>
+                      <td>Low: 5 taps, High: 3 taps</td>
+                      <td>Low: 9 taps, High: 7 taps</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Color Transform</strong></td>
+                      <td>RCT (Reversible Color Transform)</td>
+                      <td>ICT (Irreversible Color Transform)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Primary Use Cases</strong></td>
+                      <td>Medical DICOM, archivism, raw assets</td>
+                      <td>Digital cinema (DCI), web imaging, GIS</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="guide-diagram-box">
+              <div class="diagram-title">Wavelet Lifting Steps &amp; Color Transforms</div>
+              <svg class="guide-svg" viewBox="0 0 380 200">
+                <!-- RCT Box -->
+                <rect x="20" y="25" width="160" height="75" fill="#1e293b" stroke="#10b981" stroke-width="1.5" rx="4"/>
+                <text x="100" y="45" fill="#10b981" font-size="11" font-weight="bold" text-anchor="middle" font-family="sans-serif">RCT (Lossless RGB &harr; YUV)</text>
+                <text x="100" y="65" fill="#cbd5e1" font-size="9" text-anchor="middle" font-family="monospace">Y = &lfloor;(R + 2G + B)/4&rfloor;</text>
+                <text x="100" y="82" fill="#cbd5e1" font-size="9" text-anchor="middle" font-family="monospace">U = B - G &nbsp;|&nbsp; V = R - G</text>
 
-          <!-- Guide Chapter 6 -->
-          <article class="guide-card">
-            <div class="guide-card-icon">📦</div>
-            <h3>6. JP2 Box Containers vs Raw J2K</h3>
-            <p>JPEG 2000 files exist in two primary flavors:</p>
-            <ul>
-              <li><strong>JP2 Box Container (<code>.jp2</code>):</strong> Uses ISO base media box packaging (start signature <code>jP\040\040</code>). Stores color profiles (<code>colr</code>, ICC profiles), channel definitions (<code>cdef</code>), capture resolutions (<code>resc</code>), and XML metadata.</li>
-              <li><strong>Raw J2K Codestream (<code>.j2k</code>, <code>.jpc</code>):</strong> Pure compressed bitstream starting with the <code>SOC</code> marker (<code>0xFF4F</code>). Contains zero file-level metadata overhead; used in streaming protocols, medical DICOM encapsulation, and video (DCI).</li>
-            </ul>
-          </article>
+                <!-- ICT Box -->
+                <rect x="200" y="25" width="160" height="75" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" rx="4"/>
+                <text x="280" y="45" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle" font-family="sans-serif">ICT (Lossy RGB &harr; YCbCr)</text>
+                <text x="280" y="65" fill="#cbd5e1" font-size="9" text-anchor="middle" font-family="monospace">Y = 0.299R + 0.587G + 0.114B</text>
+                <text x="280" y="82" fill="#cbd5e1" font-size="9" text-anchor="middle" font-family="monospace">Cb = -0.1687R - 0.3313G + 0.5B</text>
+
+                <!-- Wavelet Filter Badges -->
+                <rect x="20" y="115" width="160" height="65" fill="rgba(16, 185, 129, 0.1)" stroke="#10b981" stroke-width="1" rx="4"/>
+                <text x="100" y="138" fill="#10b981" font-size="11" font-weight="bold" text-anchor="middle" font-family="sans-serif">5/3 Lifting Steps</text>
+                <text x="100" y="156" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">d[n] = x[2n+1] - &lfloor;(x[2n]+x[2n+2])/2&rfloor;</text>
+                <text x="100" y="170" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">s[n] = x[2n] + &lfloor;(d[n-1]+d[n]+2)/4&rfloor;</text>
+
+                <rect x="200" y="115" width="160" height="65" fill="rgba(56, 189, 248, 0.1)" stroke="#38bdf8" stroke-width="1" rx="4"/>
+                <text x="280" y="138" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle" font-family="sans-serif">9/7 Lifting Steps</text>
+                <text x="280" y="156" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">4 lifting steps (&alpha;, &beta;, &gamma;, &delta;)</text>
+                <text x="280" y="170" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">+ scaling factor K = 1.230174</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guide Subtab 3: Progression Orders -->
+        <div id="guide-progression" class="guide-subpane">
+          <div class="guide-content-split">
+            <div class="guide-text">
+              <h3>The 5 Progression Orders: Scalability in 4 Dimensions</h3>
+              <p>In JPEG 2000, codestream packets represent an intersection of <strong>Layer (L)</strong>, <strong>Resolution (R)</strong>, <strong>Component (C)</strong>, and <strong>Position/Precinct (P)</strong>.</p>
+              <ul>
+                <li><code>LRCP</code>: <em>Layer-Resolution-Component-Position</em>. Ideal for web streaming where image quality sharpens progressively across the entire canvas.</li>
+                <li><code>RLCP</code>: <em>Resolution-Layer-Component-Position</em>. Ideal for thumbnail generation and interactive zooming (loads lowest resolution scale first).</li>
+                <li><code>RPCL</code>: <em>Resolution-Position-Component-Layer</em>. Ideal for geographic map servers (GIS) and large remote sensing imagery.</li>
+                <li><code>PCRL</code>: <em>Position-Component-Resolution-Layer</em>. Optimized for raster display hardware and interactive panning.</li>
+                <li><code>CPRL</code>: <em>Component-Position-Resolution-Layer</em>. Transmits entire primary channel (e.g. Luminance Y) before color components.</li>
+              </ul>
+            </div>
+            <div class="guide-diagram-box">
+              <div class="diagram-title">Progression Order Flow Comparison</div>
+              <svg class="guide-svg" viewBox="0 0 380 200">
+                <!-- LRCP Stream -->
+                <text x="20" y="30" fill="#10b981" font-size="11" font-weight="bold" font-family="sans-serif">LRCP (Quality Scalability)</text>
+                <rect x="20" y="40" width="70" height="30" fill="rgba(16, 185, 129, 0.3)" stroke="#10b981" rx="3"/>
+                <text x="55" y="58" fill="#fff" font-size="9" text-anchor="middle" font-family="monospace">Layer 0</text>
+                <text x="100" y="58" fill="#94a3b8" font-size="12" text-anchor="middle">&rarr;</text>
+                <rect x="110" y="40" width="70" height="30" fill="rgba(16, 185, 129, 0.55)" stroke="#10b981" rx="3"/>
+                <text x="145" y="58" fill="#fff" font-size="9" text-anchor="middle" font-family="monospace">Layer 1</text>
+                <text x="190" y="58" fill="#94a3b8" font-size="12" text-anchor="middle">&rarr;</text>
+                <rect x="200" y="40" width="70" height="30" fill="rgba(16, 185, 129, 0.85)" stroke="#10b981" rx="3"/>
+                <text x="235" y="58" fill="#fff" font-size="9" text-anchor="middle" font-family="monospace">Layer 2</text>
+
+                <!-- RLCP Stream -->
+                <text x="20" y="115" fill="#38bdf8" font-size="11" font-weight="bold" font-family="sans-serif">RLCP (Resolution Scalability)</text>
+                <rect x="20" y="125" width="55" height="30" fill="#1e293b" stroke="#38bdf8" rx="3"/>
+                <text x="47" y="143" fill="#38bdf8" font-size="9" text-anchor="middle" font-family="monospace">1/16 Res</text>
+                <text x="85" y="143" fill="#94a3b8" font-size="12" text-anchor="middle">&rarr;</text>
+                <rect x="95" y="125" width="65" height="30" fill="#1e293b" stroke="#38bdf8" rx="3"/>
+                <text x="127" y="143" fill="#38bdf8" font-size="9" text-anchor="middle" font-family="monospace">1/4 Res</text>
+                <text x="170" y="143" fill="#94a3b8" font-size="12" text-anchor="middle">&rarr;</text>
+                <rect x="180" y="125" width="75" height="30" fill="#1e293b" stroke="#38bdf8" rx="3"/>
+                <text x="217" y="143" fill="#38bdf8" font-size="9" text-anchor="middle" font-family="monospace">Full 1x Res</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guide Subtab 4: EBCOT & Coding Passes -->
+        <div id="guide-ebcot" class="guide-subpane">
+          <div class="guide-content-split">
+            <div class="guide-text">
+              <h3>EBCOT (Embedded Block Coding with Optimal Truncation)</h3>
+              <p>EBCOT processes wavelet subbands independently in small <strong>code-blocks</strong> (usually $64 \times 64$). Quantized transform coefficients are coded bitplane by bitplane from Most Significant Bit (MSB) to Least Significant Bit (LSB).</p>
+              <p>Each bitplane is traversed using <strong>three fractional coding passes</strong> to maximize Rate-Distortion optimization:</p>
+              <ol>
+                <li><strong>Significance Propagation Pass (SPP):</strong> Evaluates insignificant samples whose 8 immediate neighbors have already become significant.</li>
+                <li><strong>Magnitude Refinement Pass (MRP):</strong> Refines the bits of samples that became significant in earlier bitplanes.</li>
+                <li><strong>Cleanup Pass (CP):</strong> Coded with context aggregation and run-length coding to process all remaining samples.</li>
+              </ol>
+            </div>
+            <div class="guide-diagram-box">
+              <div class="diagram-title">EBCOT 3-Pass Fractional Bitplane Coding</div>
+              <svg class="guide-svg" viewBox="0 0 380 200">
+                <!-- Bitplane Stack -->
+                <rect x="30" y="30" width="320" height="32" fill="#1e293b" stroke="#475569" rx="3"/>
+                <text x="40" y="50" fill="#38bdf8" font-size="10" font-family="monospace" font-weight="bold">MSB Bitplane</text>
+                <text x="190" y="50" fill="#94a3b8" font-size="9" font-family="sans-serif">&rarr; Cleanup Pass only</text>
+
+                <rect x="30" y="72" width="320" height="52" fill="#0f172a" stroke="#0284c7" stroke-width="1.5" rx="3"/>
+                <text x="40" y="90" fill="#38bdf8" font-size="10" font-family="monospace" font-weight="bold">Bitplane i</text>
+                <!-- 3 Passes -->
+                <rect x="120" y="80" width="70" height="24" fill="#0284c7" rx="3"/>
+                <text x="155" y="96" fill="#fff" font-size="9" text-anchor="middle" font-family="monospace">Pass 1: SPP</text>
+
+                <rect x="198" y="80" width="70" height="24" fill="#8b5cf6" rx="3"/>
+                <text x="233" y="96" fill="#fff" font-size="9" text-anchor="middle" font-family="monospace">Pass 2: MRP</text>
+
+                <rect x="275" y="80" width="65" height="24" fill="#10b981" rx="3"/>
+                <text x="307" y="96" fill="#fff" font-size="9" text-anchor="middle" font-family="monospace">Pass 3: CP</text>
+
+                <rect x="30" y="134" width="320" height="32" fill="#1e293b" stroke="#475569" rx="3"/>
+                <text x="40" y="154" fill="#94a3b8" font-size="10" font-family="monospace">LSB Bitplane</text>
+                <text x="200" y="154" fill="#94a3b8" font-size="9" font-family="sans-serif">&rarr; Truncated at target bitrate</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guide Subtab 5: The 6 Error Resilience Modes -->
+        <div id="guide-modes" class="guide-subpane">
+          <div class="guide-content-split">
+            <div class="guide-text">
+              <h3>The 6 SPcod Arithmetic Mode Switches</h3>
+              <p>Defined in the <code>COD</code> / <code>COC</code> marker segments, these flags fine-tune speed and noise resilience:</p>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Flag Mask</th>
+                      <th>Mode Name</th>
+                      <th>Function &amp; Encoding Effect</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>0x01</code></td>
+                      <td><strong>Selective Bypass (Lazy coding)</strong></td>
+                      <td>Bypasses MQ arithmetic coding on magnitude refinement passes, passing raw bits directly. Up to 50% faster encoding.</td>
+                    </tr>
+                    <tr>
+                      <td><code>0x02</code></td>
+                      <td><strong>Reset Context Probabilities</strong></td>
+                      <td>Resets arithmetic context state machine to uniform probability at coding pass boundaries.</td>
+                    </tr>
+                    <tr>
+                      <td><code>0x04</code></td>
+                      <td><strong>Pass Termination</strong></td>
+                      <td>Terminates the arithmetic codeword at the conclusion of every individual coding pass.</td>
+                    </tr>
+                    <tr>
+                      <td><code>0x08</code></td>
+                      <td><strong>Vertically Causal Context</strong></td>
+                      <td>Limits context neighbors to current and previous scanlines, preventing cross-pass hardware dependencies.</td>
+                    </tr>
+                    <tr>
+                      <td><code>0x10</code></td>
+                      <td><strong>Predictable Termination</strong></td>
+                      <td>Inserts strict predictable termination patterns verified by decoders to detect bitstream corruption.</td>
+                    </tr>
+                    <tr>
+                      <td><code>0x20</code></td>
+                      <td><strong>Segmentation Symbols</strong></td>
+                      <td>Inserts a 4-symbol marker (<code>1010</code> = <code>0x0A</code>) after each bitplane to flag transmission errors.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="guide-diagram-box">
+              <div class="diagram-title">Packet Markers &amp; Resilience Delimiters</div>
+              <svg class="guide-svg" viewBox="0 0 380 180">
+                <rect x="20" y="30" width="340" height="50" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" rx="4"/>
+                <rect x="30" y="40" width="60" height="30" fill="#f59e0b" rx="3"/>
+                <text x="60" y="58" fill="#000" font-size="9" font-weight="bold" text-anchor="middle" font-family="monospace">SOP Marker</text>
+                <text x="135" y="58" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">Packet Header</text>
+                <rect x="180" y="40" width="60" height="30" fill="#ec4899" rx="3"/>
+                <text x="210" y="58" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle" font-family="monospace">EPH Marker</text>
+                <text x="295" y="58" fill="#38bdf8" font-size="9" text-anchor="middle" font-family="monospace">Packet Body Data</text>
+
+                <text x="60" y="105" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="sans-serif">0xFF91 (Seq #)</text>
+                <text x="210" y="105" fill="#ec4899" font-size="9" font-weight="600" text-anchor="middle" font-family="sans-serif">0xFF92 (Header End)</text>
+                <text x="190" y="145" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="sans-serif">SOP and EPH allow decoders to resynchronize after transmission drops.</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guide Subtab 6: JP2 Box vs Codestream -->
+        <div id="guide-anatomy" class="guide-subpane">
+          <div class="guide-content-split">
+            <div class="guide-text">
+              <h3>JP2 Box Container vs Raw J2K Codestream</h3>
+              <p>A JPEG 2000 file can be encapsulated as a standardized box container or formatted as raw codestream:</p>
+              <ul>
+                <li><strong>JP2 Box Container (<code>.jp2</code>):</strong> Formatted as nested LBox/TBox structures. Contains color ICC profiles (<code>colr</code>), metadata XML (<code>xml </code>), channel definitions (<code>cdef</code>), capture resolutions (<code>resc</code>), and contiguous codestream (<code>jp2c</code>).</li>
+                <li><strong>Raw J2K Codestream (<code>.j2k</code>, <code>.jpc</code>):</strong> Starts directly with Start of Codestream (<code>SOC</code> = <code>0xFF4F</code>) delimiter. No container overhead; ideal for DICOM embedding, video streaming (Motion JPEG 2000 / DCI), and raw asset pipelines.</li>
+              </ul>
+            </div>
+            <div class="guide-diagram-box">
+              <div class="diagram-title">JP2 Box Hierarchy vs Codestream Markers</div>
+              <svg class="guide-svg" viewBox="0 0 380 200">
+                <!-- Box side -->
+                <rect x="20" y="25" width="160" height="150" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" rx="4"/>
+                <text x="100" y="42" fill="#38bdf8" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">JP2 Box Container</text>
+                <rect x="30" y="52" width="140" height="20" fill="#0f172a" stroke="#475569" rx="2"/>
+                <text x="100" y="66" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">jP\040\040 (Signature)</text>
+                <rect x="30" y="76" width="140" height="20" fill="#0f172a" stroke="#475569" rx="2"/>
+                <text x="100" y="90" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">ftyp (Brand 'jp2 ')</text>
+                <rect x="30" y="100" width="140" height="35" fill="rgba(56, 189, 248, 0.15)" stroke="#38bdf8" rx="2"/>
+                <text x="100" y="114" fill="#38bdf8" font-size="9" font-weight="bold" text-anchor="middle" font-family="monospace">jp2h (Header Superbox)</text>
+                <text x="100" y="128" fill="#cbd5e1" font-size="8" text-anchor="middle" font-family="monospace">ihdr, colr, cdef, resc</text>
+                <rect x="30" y="140" width="140" height="24" fill="#0284c7" rx="2"/>
+                <text x="100" y="156" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle" font-family="monospace">jp2c (Codestream Box)</text>
+
+                <!-- Marker side -->
+                <rect x="200" y="25" width="160" height="150" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5" rx="4"/>
+                <text x="280" y="42" fill="#f59e0b" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">Raw J2K Codestream</text>
+                <rect x="210" y="52" width="140" height="20" fill="#0f172a" stroke="#f59e0b" rx="2"/>
+                <text x="280" y="66" fill="#f59e0b" font-size="9" text-anchor="middle" font-family="monospace">0xFF4F SOC (Start)</text>
+                <rect x="210" y="76" width="140" height="20" fill="#0f172a" stroke="#475569" rx="2"/>
+                <text x="280" y="90" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">0xFF51 SIZ (Image Size)</text>
+                <rect x="210" y="100" width="140" height="20" fill="#0f172a" stroke="#475569" rx="2"/>
+                <text x="280" y="114" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">0xFF52 COD | 0xFF5C QCD</text>
+                <rect x="210" y="124" width="140" height="20" fill="#0f172a" stroke="#475569" rx="2"/>
+                <text x="280" y="138" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">0xFF90 SOT &rarr; 0xFF93 SOD</text>
+                <rect x="210" y="148" width="140" height="18" fill="#0f172a" stroke="#f59e0b" rx="2"/>
+                <text x="280" y="161" fill="#f59e0b" font-size="9" text-anchor="middle" font-family="monospace">0xFFD9 EOC (End)</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guide Subtab 7: Libraries & Engines -->
+        <div id="guide-engines" class="guide-subpane">
+          <div class="guide-content-split">
+            <div class="guide-text">
+              <h3>Libraries &amp; Engines Powering JPEG2000 info</h3>
+              <p>This application combines open-source C libraries with custom binary parsers to provide both server-grade and 100% offline browser inspection:</p>
+              <ul>
+                <li><strong>OpenJPEG v2.5.4 (libopenjp2):</strong> The official open-source C reference implementation maintained by the JPEG committee. Used on the backend and CLI to generate, validate, and decompress sample profiles into rasters (<code>opj_decompress</code>, <code>opj_compress</code>, <code>opj_dump</code>).</li>
+                <li><strong>ClientJP2Parser (Browser Native JavaScript):</strong> Our custom, zero-dependency binary parser implemented in vanilla JavaScript using the native <code>DataView</code> and <code>Uint8Array</code> APIs. Reads and decodes every box and codestream marker segment directly inside the client's web browser, enabling true serverless deployment on GitHub Pages.</li>
+                <li><strong>JPEG2000Parser (Python Backend &amp; CLI):</strong> Pure-Python binary parsing engine for terminal dumps, JSON extraction, and Markdown reports without requiring native compilers or external Python packages.</li>
+                <li><strong>Pixi Package Manager:</strong> Reproducible environment orchestrator providing pinned multi-platform binaries across macOS, Linux, and Windows via Conda-Forge.</li>
+              </ul>
+            </div>
+            <div class="guide-diagram-box">
+              <div class="diagram-title">System Architecture</div>
+              <svg class="guide-svg" viewBox="0 0 380 180">
+                <!-- Browser Box -->
+                <rect x="20" y="25" width="160" height="135" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" rx="4"/>
+                <text x="100" y="45" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle" font-family="sans-serif">Browser / GitHub Pages</text>
+                <rect x="30" y="58" width="140" height="26" fill="#0284c7" rx="3"/>
+                <text x="100" y="75" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle" font-family="monospace">ClientJP2Parser (JS)</text>
+                <rect x="30" y="90" width="140" height="26" fill="#0f172a" stroke="#475569" rx="3"/>
+                <text x="100" y="107" fill="#cbd5e1" font-size="9" text-anchor="middle" font-family="sans-serif">HTML5 Canvas DWT Tree</text>
+                <text x="100" y="140" fill="#10b981" font-size="9" font-weight="600" text-anchor="middle" font-family="sans-serif">&check; 100% Serverless &amp; Offline</text>
+
+                <!-- Backend Box -->
+                <rect x="200" y="25" width="160" height="135" fill="#1e293b" stroke="#8b5cf6" stroke-width="1.5" rx="4"/>
+                <text x="280" y="45" fill="#8b5cf6" font-size="11" font-weight="bold" text-anchor="middle" font-family="sans-serif">CLI &amp; Local Server</text>
+                <rect x="210" y="58" width="140" height="26" fill="#8b5cf6" rx="3"/>
+                <text x="280" y="75" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle" font-family="monospace">OpenJPEG 2.5.4 (C)</text>
+                <rect x="210" y="90" width="140" height="26" fill="#0f172a" stroke="#475569" rx="3"/>
+                <text x="280" y="107" fill="#cbd5e1" font-size="9" text-anchor="middle" font-family="monospace">JPEG2000Parser (Py)</text>
+                <text x="280" y="140" fill="#38bdf8" font-size="9" font-weight="600" text-anchor="middle" font-family="sans-serif">&check; Pixi / Conda-Forge Powered</text>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </section>
