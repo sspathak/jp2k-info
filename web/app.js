@@ -65,6 +65,14 @@ class App {
     this.chkTileOverlay = document.getElementById('chk-tile-overlay');
     this.channelBtns = document.querySelectorAll('.channel-btn');
 
+    this.previewImg.onerror = () => {
+      this.previewImg.classList.add('hidden');
+      this.channelCanvas.classList.remove('hidden');
+      if (this.currentData?.summary) {
+        this.renderSyntheticPreview(this.currentData.summary);
+      }
+    };
+
     // Hex viewer
     this.hexViewer = document.getElementById('hex-viewer');
     this.hexRangeLabel = document.getElementById('hex-range-label');
@@ -186,20 +194,24 @@ class App {
   }
 
   async loadSample(sampleId) {
-    try {
-      // First try to fetch from API
-      const metaResp = await fetch(`/api/sample_meta/${sampleId}`);
-      if (metaResp.ok) {
-        const meta = await metaResp.json();
-        // Fetch raw binary for hex inspection
-        const binResp = await fetch(`/api/sample/${sampleId}`);
-        const buffer = await binResp.arrayBuffer();
-        this.currentRawBytes = new Uint8Array(buffer);
-        this.applyData(meta);
-        return;
+    const isStaticHost = window.location.hostname.includes('github.io') ||
+                         window.location.protocol === 'file:' ||
+                         window.location.port !== '8000';
+
+    if (!isStaticHost) {
+      try {
+        const metaResp = await fetch(`/api/sample_meta/${sampleId}`);
+        if (metaResp.ok) {
+          const meta = await metaResp.json();
+          const binResp = await fetch(`/api/sample/${sampleId}`);
+          const buffer = await binResp.arrayBuffer();
+          this.currentRawBytes = new Uint8Array(buffer);
+          this.applyData(meta);
+          return;
+        }
+      } catch (_) {
+        // Fall back to client-side parsing
       }
-    } catch (_) {
-      // Offline fallback: fetch directly from static samples folder
     }
 
     try {
@@ -215,12 +227,16 @@ class App {
         'metadata_comment': 'metadata_comment.jp2'
       };
       const fname = sampleNames[sampleId] || `${sampleId}.jp2`;
-      const resp = await fetch(`/samples/${fname}`);
+      const baseName = fname.replace(/\.[^.]+$/, '');
+      const resp = await fetch(`./samples/${fname}`);
+      if (!resp.ok) {
+        throw new Error(`Failed to load ${fname} (HTTP ${resp.status})`);
+      }
       const buf = await resp.arrayBuffer();
       this.currentRawBytes = new Uint8Array(buf);
       const parser = new ClientJP2Parser(buf, fname);
       const meta = parser.parse();
-      meta.preview_url = `/samples/${fname.rsplit ? fname.rsplit('.', 1)[0] : fname.replace(/\.[^.]+$/, '')}.png`;
+      meta.preview_url = `./samples/${baseName}.png`;
       this.applyData(meta);
     } catch (err) {
       this.showToast(`Error loading sample: ${err.message}`, true);
@@ -232,26 +248,31 @@ class App {
       const buffer = await file.arrayBuffer();
       this.currentRawBytes = new Uint8Array(buffer);
 
-      // Try server upload first for opj_decompress support
       let meta = null;
-      try {
-        const uploadResp = await fetch('/api/upload', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/octet-stream',
-            'X-Filename': file.name
-          },
-          body: buffer
-        });
-        if (uploadResp.ok) {
-          meta = await uploadResp.json();
-        }
-      } catch (_) {}
+      const isStaticHost = window.location.hostname.includes('github.io') ||
+                           window.location.protocol === 'file:';
 
-      // Fallback to client-side parse
+      if (!isStaticHost) {
+        try {
+          const uploadResp = await fetch('/api/upload', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/octet-stream',
+              'X-Filename': file.name
+            },
+            body: buffer
+          });
+          if (uploadResp.ok) {
+            meta = await uploadResp.json();
+          }
+        } catch (_) {}
+      }
+
+      // Client-side parser runs 100% in browser
       if (!meta || meta.error) {
         const parser = new ClientJP2Parser(buffer, file.name);
         meta = parser.parse();
+        meta.preview_url = null;
       }
 
       this.sampleSelect.value = '';
@@ -450,24 +471,62 @@ class App {
 
   renderSyntheticPreview(s) {
     const ctx = this.channelCanvas.getContext('2d');
-    const w = this.channelCanvas.width;
-    const h = this.channelCanvas.height;
+    const w = this.channelCanvas.width = 380;
+    const h = this.channelCanvas.height = 380;
     ctx.clearRect(0, 0, w, h);
 
-    // Gradient background representation
+    // Dark canvas background
     const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, '#1e293b');
-    grad.addColorStop(1, '#0f172a');
+    grad.addColorStop(0, '#0f172a');
+    grad.addColorStop(1, '#020617');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
 
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = '14px Inter, sans-serif';
+    // Subtle grid pattern
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < w; x += 38) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+    }
+    for (let y = 0; y < h; y += 38) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
+
+    // Border
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(10, 10, w - 20, h - 20);
+
+    // Badge
+    ctx.fillStyle = s.is_lossless ? '#10b981' : '#f59e0b';
+    ctx.fillRect(20, 20, 130, 26);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11px Inter, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(`JPEG 2000 ${s.dimensions}`, w / 2, h / 2 - 10);
+    ctx.fillText(s.is_lossless ? 'LOSSLESS 5/3' : 'LOSSY 9/7', 85, 37);
+
+    // Main text
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = 'bold 18px Inter, sans-serif';
+    ctx.fillText(s.dimensions || 'JPEG 2000', w / 2, h / 2 - 25);
+
     ctx.fillStyle = '#94a3b8';
+    ctx.font = '12px monospace';
+    ctx.fillText(`${s.colorspace} • ${s.bit_depth}-bit`, w / 2, h / 2);
+
+    ctx.fillStyle = '#38bdf8';
     ctx.font = '11px monospace';
-    ctx.fillText(`${s.compression_mode} | ${s.colorspace}`, w / 2, h / 2 + 15);
+    ctx.fillText(`Progression: ${s.progression_order} • ${s.num_layers} Layers`, w / 2, h / 2 + 25);
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.fillText('Client-side decoded codestream & DWT tree ready', w / 2, h - 30);
   }
 
   applyChannelFilter(channel) {

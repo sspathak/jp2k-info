@@ -1,6 +1,12 @@
 # JPEG 2000 Deep Inspector & Encoding Analyzer (ISO/IEC 15444-1)
 
+[![Deploy to GitHub Pages](https://github.com/sspathak/jp2k-info/actions/workflows/pages.yml/badge.svg)](https://github.com/sspathak/jp2k-info/actions/workflows/pages.yml)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=flat&logo=github)](https://sspathak.github.io/jp2k-info/)
+
 A complete toolchain and interactive web application designed to open, inspect, and analyze the encoding parameters of **JPEG 2000** files (`.jp2`, `.j2k`, `.jpc`, `.jpx`).
+
+👉 **Live Interactive Web App:** [https://sspathak.github.io/jp2k-info/](https://sspathak.github.io/jp2k-info/)
+*(Runs 100% client-side in the browser via JavaScript binary parsing — no server required!)*
 
 ---
 
